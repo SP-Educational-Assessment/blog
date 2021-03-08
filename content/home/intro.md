@@ -8,11 +8,10 @@ headless: true
 # Order that this section will appear in.
 weight: 10
 
-title: ✏️ Blog Template
-subtitle: 'For [Wowchemy Website Builder](https://wowchemy.com/)'
+title: SP Educational Assessment Blog
 
 design:
   background:
-    color: '#090a0b'
+    color: '#EFAE44'
     text_color_light: true
 ---
