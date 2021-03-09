@@ -1,22 +1,19 @@
 ---
 title: The Practical Application of Computerised Multistage Tests
-author: R package build
+author: James Page
 date: '2021-03-08'
 slug: mst-primer-1
 categories:
   - R
 tags:
   - irt
+  - mst
 subtitle: 'A practical guide to the design and development of computerised multistage tests'
 summary: ''
 authors: [ 'James Page' ]
 lastmod: '2021-03-08T20:49:06Z'
 math: true
 featured: yes
-image:
-  caption: ''
-  focal_point: ''
-  preview_only: no
 projects: []
 link-citations: true
 bibliography: [ references.bib ]
