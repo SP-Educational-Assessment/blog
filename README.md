@@ -92,27 +92,27 @@ Note that HTTPS is not configured for use in the Docker container.
 
 ## Publish to Live
 
-The easiest way to publish to the Mythic Beasts hosting service is to zip the build directory then copy it to the `onza` host:
+The easiest way to publish to the Mythic Beasts hosting service is to zip the `public` directory then copy it to the `onza` host:
 
 ```bash
-zip -r speduas-blog-image build -x "*.DS_Store"
+cp .htaccess public/.htaccess
+zip -r speduas-blog-image public -x "*.DS_Store"
 scp speduas-blog-image.zip jamesp27@onza.mythic-beasts.com:www
 ```
 
-Then log on to the `onza` host and extract to a new folder called `build` in `www`:
+Then log on to the `onza` host and extract to a new folder called `public` in `www`:
 
 ```bash
 unzip speduas-blog-image.zip
 ```
 
-You can use the `tree build` command to check that the files have been extracted.
+You can use the `tree public` command to check that the files have been extracted.
 
 Finally, when you are ready to make the switch, do a folder rename like this:
 
 ```bash
 mv blog.speduconsulting.co.uk oldsite
-mv build blog.speduconsulting.co.uk
-rm -Rf build
+mv public blog.speduconsulting.co.uk
 ```
 
 Then use the following URL to browse the live site: <https://blog.speduconsulting.co.uk/>.
