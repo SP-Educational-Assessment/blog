@@ -3,11 +3,7 @@ title: The Practical Application of Computerised Multistage Tests
 author: James Page
 date: '2021-03-08'
 slug: mst-primer-1
-categories:
-  - R
-tags:
-  - irt
-  - mst
+tags: [ 'irt', 'mst' 'rasch' ]
 subtitle: 'A practical guide to the design and development of computerised multistage tests'
 summary: ''
 authors: [ 'James Page' ]

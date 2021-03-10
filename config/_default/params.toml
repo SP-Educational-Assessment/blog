@@ -153,7 +153,7 @@ reading_time = true
 section_pager = true
 
 # Enable in-built social sharing buttons? (true/false)
-sharing = true
+sharing = false
 
 # Show a copyright license from creativecommons.org in the site footer?
 # Page specific copyright licenses are also possible by adding this option to a page's front matter.
@@ -240,9 +240,10 @@ plugins_js  = []
 ## Marketing
 ############################
 [marketing]
-  google_analytics = ""
+  google_analytics = "G-93YMDGW47F"
   google_tag_manager = ""
   google_site_verification = ""
+
 
 ############################
 ## Content Management System
