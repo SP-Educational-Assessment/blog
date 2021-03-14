@@ -177,19 +177,21 @@ plugins_js  = []
 ## Comments
 ############################
 [comments]
+  disqusShortname = "disqus"
+
   # Comment provider:
   #   "": Disabled
   #   "disqus": Disqus (https://disqus.com)
   #   "commento": Commento (https://commento.io)
-  provider = ""
+  #provider = "disqus"
 
   # Which page types are commentable?
   commentable = {post = true}
 
   # Configuration of Disqus.
   [comments.disqus]
-    shortname = ""  # Paste the shortname from your Disqus dashboard.
-    show_count = true  # Show comment count in page header? (true/false)
+  #  shortname = "spedublog-1"
+   # show_count = true
 
   # Configuration of Commento.
   [comments.commento]
