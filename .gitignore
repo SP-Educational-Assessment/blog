@@ -6,3 +6,4 @@ public
 blogdown
 
 *.tar
+.DS_Store
