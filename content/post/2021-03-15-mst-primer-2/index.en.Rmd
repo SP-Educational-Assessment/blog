@@ -76,17 +76,16 @@ Average difficulty levels for each module are shown in Figure 1 below (where $\b
 Here we create in R a set of items `it.MST` that will be used in the analysis with `mstR`. We'll be using randomly generated item difficulties drawn from a normal distribution. First we'll import the R packages we'll need, including `mstR`. If you've not used this package before you'll need to install it first by running `install.packages('mstR')`. 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = TRUE)
 library(kableExtra)
 library(tidyverse)
 library(janitor)
-
-library(mstR)
-
-options(scipen = 1, digits = 3)
 ```
 
 ```{r module difficulties, echo=TRUE}
+library(mstR)
+options(scipen = 1, digits = 3)
+
 it.MST <- rbind(genDichoMatrix(12, model = "1PL", bPrior = c("norm", 0.0, 1)),
 	genDichoMatrix(8, model = "1PL", bPrior = c("norm", -1.0, 1)),
 	genDichoMatrix(8, model = "1PL", bPrior = c("norm", 1.0, 1)),
