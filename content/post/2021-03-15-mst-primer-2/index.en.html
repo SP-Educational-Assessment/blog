@@ -1,0 +1,623 @@
+---
+title: "Development of Multistage Tests (MSTs)"
+author: "James Page"
+date: '2021-03-15'
+slug: mst-primer-2
+categories: R
+tags:
+- irt
+- rasch
+- mst
+- mstR
+subtitle: A practical guide to developing a computerised multistage test (MST)
+summary: ''
+lastmod: '2021-03-15T08:14:25Z'
+featured: yes
+math: yes
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+link-citations: yes
+bibliography: references.bib
+---
+
+<script src="{{< blogdown/postref >}}index.en_files/kePrint/kePrint.js"></script>
+<link href="{{< blogdown/postref >}}index.en_files/lightable/lightable.css" rel="stylesheet" />
+
+
+<div id="the-development-of-msts" class="section level1">
+<h1>The Development of MSTs</h1>
+<p>In this part we describe the steps needed for the development of MSTs. Here we turn our attention to initial validation of a test design.</p>
+<div id="simulation" class="section level2">
+<h2>Simulation</h2>
+<p>In the pre-trial stage, it is useful to run simulations to help us answer the questions posed in the previous part of this article. The results of these simulations will help inform final decisions about the test design. It’s always less expensive to make modifications to a design early on in the process, before significant investment in item writing and trialling has been made. The ability to simulate a test at the design phase can be used to understand the constraints of the design at an early stage and make changes in a low-cost, low-risk way. In this section we’ll show how the <code>mstR</code> R package can be used to run simulations for a MST design. First though we’ll cover the data sources that we’ll be using.</p>
+</div>
+<div id="data-sources-and-management" class="section level2">
+<h2>Data Sources and Management</h2>
+<p>In order to perform a simulated test, there are a number of different data sources that are required. To start with we need to consider the following entities that will be used to construct a test:</p>
+<ul>
+<li>Items</li>
+<li>Modules</li>
+<li>Panels</li>
+</ul>
+<p>In addition to the item information, another data source is used for the candidate information. This forms the candidate information system (CIS) that will be used for the test. In addition to storing a unique candidate ID, additional metadata of interest, such as the candidate’s length of study or first language (L1), may be held by the CIS.</p>
+<p>Finally, test response data is required. Essentially this is a matrix containing rows of candidates and columns of items. Cells in the matrix contain a 1 (item answered correctly) or a 0 (item answered incorrectly). Items that were not presented (for example, from a module that was not in the test path for a candidate) are left blank and are classed as NA.</p>
+<p>This data may be stored as flat files (in CSV format for instance), or held in database tables, or in a mix of different sources. Typically a cloud storage system will be used (for example in AWS S3 buckets or in a cloud database such as Amazon RDS). This is to ensure that the data is stored in a way that is secure, accessible and geographically distributed (for resilience).</p>
+</div>
+<div id="pre-trial-simulation-and-design" class="section level2">
+<h2>Pre-Trial Simulation and Design</h2>
+<p>An initial simulation of the test can be used to experiment with different designs. We show how to do this using the <code>mstR</code> library (see <span class="citation">Magis, Yan, and Von Davier (<a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span>). Here the aim is to select a set of designs and see if there is an optimal design. It will also help understand how the scoring of the test should be implemented, including the number correct (NC) scores that will be used for routing, and the ability estimates for final scoring and reporting.</p>
+<p>The <code>mstR</code> library can take an existing set of item responses, or you can use it to generate a set of randomised simulated item responses. This latter ability is useful in the pre-trial stage where we’re interested in finding out how routing between modules should be established, or to validate assumptions in the test design.</p>
+<p>The aim here is to sift several different test designs with a view of converging on the optimal design for the . The ability to re-run simulations easily with different design parameters provides a powerful means of trying out different design ideas before incurring the costs of engaging item writers, raters and trial candidates.</p>
+<div id="module-setup" class="section level3">
+<h3>Module Setup</h3>
+<p>With <code>mstR</code> it is possible to define:</p>
+<ul>
+<li>the module topology (number of stages and modules per stage)</li>
+<li>the number of items per module and the average module difficulty</li>
+<li>the IRT model to use</li>
+</ul>
+<p>Assuming the 1-2-4 pattern shown above, with a total of 30 items (12 + 8 + 10), a simulation for the test design can be created from following elements:</p>
+<ul>
+<li>a simulated item bank</li>
+<li>the modules and the items they contain</li>
+<li>the routing rules in the transition matrix</li>
+</ul>
+<p>Average difficulty levels for each module are shown in Figure 5 below (where <span class="math inline">\(\bar{b}\)</span> is the mean difficulty of the module, and a standard deviation of 1 is assumed)</p>
+<div class="figure">
+<img src="images/module-items.png" alt="" />
+<p class="caption">MST Design with average difficulty levels</p>
+</div>
+<div id="the-simulated-item-bank" class="section level4">
+<h4>The Simulated Item Bank</h4>
+<p>Here we create in R a set of items <code>it.MST</code> that will be used in the analysis with <code>mstR</code>. We’ll be using randomly generated item difficulties drawn from a normal distribution. First we’ll import the R packages we’ll need, including <code>mstR</code> and the</p>
+<pre class="r"><code>it.MST &lt;- rbind(genDichoMatrix(12, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, 0.0, 1)),
+    genDichoMatrix(8, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, -1.0, 1)),
+    genDichoMatrix(8, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, 1.0, 1)),
+    genDichoMatrix(10, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, -1.5, 1)),
+    genDichoMatrix(10, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, -0.5, 1)),
+    genDichoMatrix(10, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, 0.5, 1)),
+    genDichoMatrix(10, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, 1.5, 1)))
+it.MST &lt;- as.matrix(it.MST)</code></pre>
+<p>Here we’ve decided to use the 1PL (or Rasch) model, so we need to supply <code>bPrior</code> difficulty distributions, and convert the data frame into a matrix. The <code>bPrior</code> parameter is constructed using a normal distribution with a given <span class="math inline">\(\bar{b}\)</span> and standard deviation of 1.
+We’ll end up with a matrix of 68 items, each with randomised difficulty parameters.</p>
+</div>
+<div id="assigning-items-to-modules" class="section level4">
+<h4>Assigning Items to Modules</h4>
+<p>Selecting items into the modules is done by creating another matrix with 68 rows (items) and 7 columns (modules); a cell containing a 1 indicates membership of an item in a module. Because we’re using an R matrix to store this information we must use the index of the module (module A = 1, module B = 2, and so on); the code snippet below uses a helper function called <code>module()</code> to map from names to indices.</p>
+<pre class="r"><code># create a function to map module names to indices
+moduleIndices &lt;- seq(1:7)
+moduleNames &lt;- c(&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;G&#39;)
+names(moduleIndices) &lt;- moduleNames
+module &lt;- function(n) { unname(moduleIndices[n]) }
+
+modules &lt;- matrix(0, 68, 7)
+modules[1:12, module(&#39;A&#39;)] &lt;- 1
+modules[13:20, module(&#39;B&#39;)] &lt;- 1
+modules[21:28, module(&#39;C&#39;)] &lt;- 1
+modules[29:38, module(&#39;D&#39;)] &lt;- 1
+modules[39:48, module(&#39;E&#39;)] &lt;- 1
+modules[49:58, module(&#39;F&#39;)] &lt;- 1
+modules[59:68, module(&#39;G&#39;)] &lt;- 1</code></pre>
+</div>
+<div id="module-routing" class="section level4">
+<h4>Module Routing</h4>
+<p>The final part of the design activity is construction of the routing paths and cut-offs used for next module selection. This is done by creating an <span class="math inline">\(R \times R\)</span> <em>transition matrix</em> which shows the valid paths to modules in the next stage (where <span class="math inline">\(R\)</span> is the number of modules). A value of 1 in the <code>routing</code> matrix in the code sample below indicates that a path exists from module <span class="math inline">\(i\)</span> to module <span class="math inline">\(j\)</span>. To use the example below the rule <code>routing[module('A'), module('B'):module('C')] &lt;- 1</code> means module A routes to modules B and C.</p>
+<p>In addition to the routing paths, a set of cut-off criteria must be given. These are expressed in terms of <span class="math inline">\(\hat{\theta}\)</span> using the <code>cutoff</code> matrix (see below). To use an example here, the rule <code>cutoff[module('B'),] &lt;- c(-Inf, 0.0)</code> means that candidates with ability estimates from minus infinity to zero will be routed to module B. The rule <code>cutoff[module('C'),] &lt;- c(0.0, Inf)</code> means that candidates with ability estimates from zero to positive infinity will be routed to module C.</p>
+<pre class="r"><code>routing &lt;- matrix(0, 7, 7)
+routing[module(&#39;A&#39;), module(&#39;B&#39;):module(&#39;C&#39;)] &lt;- 1
+routing[module(&#39;B&#39;), module(&#39;D&#39;):module(&#39;F&#39;)] &lt;- 1
+routing[module(&#39;C&#39;), module(&#39;E&#39;):module(&#39;G&#39;)] &lt;- 1
+
+cutoff &lt;- matrix(NA, 7, 2)
+cutoff[module(&#39;B&#39;),] &lt;- c(-Inf, 0.0)
+cutoff[module(&#39;C&#39;),] &lt;- c(0.0, Inf)
+cutoff[module(&#39;D&#39;),] &lt;- c(-Inf, -1.0)
+cutoff[module(&#39;E&#39;),] &lt;- c(-1.0, 0.0)
+cutoff[module(&#39;F&#39;),] &lt;- c(0.0, 1.0)
+cutoff[module(&#39;G&#39;),] &lt;- c(1.0, Inf)
+
+(cutoff)</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]   NA   NA
+## [2,] -Inf    0
+## [3,]    0  Inf
+## [4,] -Inf   -1
+## [5,]   -1    0
+## [6,]    0    1
+## [7,]    1  Inf</code></pre>
+<p>As can be seen, module D to module G are final stage modules, so do not route onward.</p>
+</div>
+</div>
+<div id="test-simulation" class="section level3">
+<h3>Test Simulation</h3>
+<p>Having created a simulated item bank for the design, it is possible to generate simulated item responses by selecting a <span class="math inline">\(\theta\)</span> for a simulated candidate and running the <code>genPattern()</code> function to return a set of simulated item responses:</p>
+<pre class="r"><code>theta &lt;- 0.95
+
+dfSampleResponse &lt;- genPattern(theta, it.MST)
+
+(dfSampleResponse)</code></pre>
+<pre><code>##  [1] 0 1 1 0 1 1 1 1 0 1 0 1 1 1 1 0 1 1 1 1 0 1 0 0 0 0 0 0 1 1 1 0 1 1 1 1 1 1
+## [39] 1 1 0 0 1 1 1 1 1 1 1 0 1 1 1 1 0 1 1 1 0 1 1 0 0 1 1 0 0 0</code></pre>
+<p>Here we use a <span class="math inline">\(\theta\)</span> of 0.95 for our hypothetical candidate as an example. Note that this doesn’t really simulate a true MST test, as it ignores the routing rules and simply returns a response for all items in the simulated item bank. We can however use the <code>randomMST()</code> function to perform a more realistic simulation. The <code>randomMST()</code> function will generate a response pattern for a given simulated item bank, an MST structure, and a true ability level (<span class="math inline">\(\theta\)</span>). We’ll use Bayesian model estimation (<code>"BM"</code>) for ability estimation (this is the default ability estimation method for the <code>mstR</code> library). The maximum Fisher information criterion (<code>"MFI"</code>) for is used for module selection; again this is the default. The Fisher information is the measure of the amount of information that item <span class="math inline">\(X\)</span> carries about the unknown ability parameter <span class="math inline">\(\theta\)</span>.</p>
+<pre class="r"><code>start &lt;- list(theta = theta)
+test &lt;- list(method = &quot;BM&quot;, moduleSelect = &quot;MFI&quot;)
+final &lt;- list(method = &quot;BM&quot;)
+
+dfMSTResponse &lt;- randomMST(trueTheta = theta, 
+                           itemBank = it.MST, 
+                           modules = modules, transMatrix = routing,
+                           start = start, test = test, final = final)
+
+(dfMSTResponse)</code></pre>
+<pre><code>## Random generation of a MST response pattern 
+##   without fixing the random seed 
+##  
+##  Item bank calibrated under One-Parameter Logistic (Rasch) model 
+##  
+##  True ability level: 0.95 
+##  
+##  MST structure: 
+##    Number of stages: 3 
+##    Structure (number of modules per stage): 1-2-4 
+##  
+##  Starting parameters: 
+##    Number of available modules at first stage: 1 
+##    Selection of the first stage module: by maximizing module information 
+##      for starting ability 
+##    Starting ability level: 0.95 
+## 
+##  Multistage test parameters: 
+##    Next module selection: maximum Fisher information 
+##    Provisional ability estimator: Bayes modal (MAP) estimator 
+##      Provisional prior ability distribution: N(0,1) prior 
+##    Ability estimation adjustment for constant pattern: none 
+##    Randomesque selection of optimal module: no 
+## 
+##  Multistage test details: 
+## 
+##   Stage 1:
+##     Module administered: 1 
+##     Number of items in module 1: 12 items
+##     Optimal module: yes 
+##     Items and responses: 
+##                                          
+## Nr     1  2  3  4  5  6  7  8  9 10 11 12
+## Item   1  2  3  4  5  6  7  8  9 10 11 12
+## Resp.  1  1  1  0  1  0  0  0  1  1  1  1
+## 
+##     Provisional ability estimate (SE) after stage 1: 0.747 (0.533)
+## 
+##   Stage 2:
+##     Module administered: 3 
+##     Number of items in module 3: 8 items
+##     Optimal module: yes 
+##     Items and responses: 
+##                              
+## Nr     1  2  3  4  5  6  7  8
+## Item  21 22 23 24 25 26 27 28
+## Resp.  0  0  0  0  0  0  1  0
+## 
+##     Provisional ability estimate (SE) after stage 2: 0.298 (0.439)
+## 
+##   Stage 3:
+##     Module administered: 6 
+##     Number of items in module 6: 10 items
+##     Optimal module: yes 
+##     Items and responses: 
+##                                    
+## Nr     1  2  3  4  5  6  7  8  9 10
+## Item  49 50 51 52 53 54 55 56 57 58
+## Resp.  1  1  1  0  0  1  1  0  0  1
+## 
+##     Provisional ability estimate (SE) after stage 3: 0.529 (0.366)
+## 
+##  Final results: 
+##    Total length of multistage test: 30 items 
+##    Final ability estimator: Bayes modal (MAP) estimator 
+##    Final prior distribution: N(0,1) prior 
+##    Final ability estimate (SE): 0.529 (0.366) 
+##    95% confidence interval: [-0.188,1.247] 
+## 
+##  Output was not captured!</code></pre>
+<p>For this simulated candidate with a true <span class="math inline">\(\theta\)</span> of 0.95, the MST has delivered an estimated ability <span class="math inline">\(\hat{\theta}\)</span> of 0.529.</p>
+<p>The Module Information Function is used to determine the ‘best’ (that is the most informative) module to route to in the next stage. In this case the modules that the candidate was routed to were A, C, F. A plot can be made as follows, showing the highlighted route through the multi-stage test. Note that the output from the <code>randomMST</code> function and the plot use the module and item indices (rather than their labels), so you may want to map these back to a name for ease of interpretation.</p>
+<div class="figure">
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/show%20simulated%20test-1.png" alt="Example routing" width="672" />
+<p class="caption">
+(#fig:show simulated test)Example routing
+</p>
+</div>
+<pre><code>## The plot was not captured!</code></pre>
+</div>
+<div id="running-repeated-simulations" class="section level3">
+<h3>Running Repeated Simulations</h3>
+<p>We can run repeated simulations varying the topology of the test, for example changing number of stages and modules. Or by changing the number of items per module, the mean difficulty levels, or some other aspect of the model. By calculating the differences between estimated and true ability levels we can see which set of test features would be most optimal.</p>
+<p>In this example we’ll change the mean difficulties of the modules as well as the number of items per module; keeping the total number of items administered constant, but changing the relative number of items as follows:</p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:test-design-params">Table 1: </span>MST design paramaters
+</caption>
+<thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Stage
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="7">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Module
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:right;">
+Design
+</th>
+<th style="text-align:right;">
+1
+</th>
+<th style="text-align:right;">
+2
+</th>
+<th style="text-align:right;">
+3
+</th>
+<th style="text-align:right;">
+A
+</th>
+<th style="text-align:right;">
+B
+</th>
+<th style="text-align:right;">
+C
+</th>
+<th style="text-align:right;">
+D
+</th>
+<th style="text-align:right;">
+E
+</th>
+<th style="text-align:right;">
+F
+</th>
+<th style="text-align:right;">
+G
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+-1.00
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+-1.50
+</td>
+<td style="text-align:right;">
+-0.500
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+1.5
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+-0.50
+</td>
+<td style="text-align:right;">
+-1.89
+</td>
+<td style="text-align:right;">
+1.23
+</td>
+<td style="text-align:right;">
+-1.90
+</td>
+<td style="text-align:right;">
+-0.420
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+2.8
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+-0.05
+</td>
+<td style="text-align:right;">
+-1.89
+</td>
+<td style="text-align:right;">
+1.23
+</td>
+<td style="text-align:right;">
+-2.14
+</td>
+<td style="text-align:right;">
+-0.890
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+0.54
+</td>
+<td style="text-align:right;">
+-1.23
+</td>
+<td style="text-align:right;">
+1.89
+</td>
+<td style="text-align:right;">
+-2.45
+</td>
+<td style="text-align:right;">
+-0.620
+</td>
+<td style="text-align:right;">
+1.5
+</td>
+<td style="text-align:right;">
+3.1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+0.20
+</td>
+<td style="text-align:right;">
+-1.23
+</td>
+<td style="text-align:right;">
+1.89
+</td>
+<td style="text-align:right;">
+-1.90
+</td>
+<td style="text-align:right;">
+-0.542
+</td>
+<td style="text-align:right;">
+1.7
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+-0.67
+</td>
+<td style="text-align:right;">
+-1.23
+</td>
+<td style="text-align:right;">
+1.89
+</td>
+<td style="text-align:right;">
+-2.76
+</td>
+<td style="text-align:right;">
+-0.700
+</td>
+<td style="text-align:right;">
+2.1
+</td>
+<td style="text-align:right;">
+2.2
+</td>
+</tr>
+</tbody>
+</table>
+<p>We define the <code>mstDesign()</code> function to generate the set of test designs we want to investigate. This function varies the number of items for each module by stage and can be repeatedly applied to a set of designs which we load in from a CSV file. The <code>mstDesign()</code> function effectively generates multiple variants of the test design.</p>
+<pre class="r"><code>mstDesign &lt;- function(design, stage1, stage2, stage3,
+                      module_a, module_b, module_c, module_d, module_e, module_f, module_g) {
+  matrixN &lt;- stage1 + (2 * stage2) + (4 * stage3)
+  modules &lt;- matrix(0, matrixN, 7)
+  moduleA_items &lt;- stage1
+  moduleB_items &lt;- moduleA_items + stage2
+  moduleC_items &lt;- moduleB_items + stage2
+  moduleD_items &lt;- moduleC_items + stage3
+  moduleE_items &lt;- moduleD_items + stage3
+  moduleF_items &lt;- moduleE_items + stage3
+  moduleG_items &lt;- moduleF_items + stage3
+
+  modules[1:moduleA_items, 1] &lt;- 1
+  modules[moduleA_items+1:stage2, 2] &lt;- 1
+  modules[moduleB_items+1:stage2, 3] &lt;- 1
+  modules[moduleC_items+1:stage3, 4] &lt;- 1
+  modules[moduleD_items+1:stage3, 5] &lt;- 1
+  modules[moduleE_items+1:stage3, 6] &lt;- 1
+  modules[moduleF_items+1:stage3, 7] &lt;- 1
+
+  itembank &lt;- rbind(genDichoMatrix(stage1, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, module_a, 1)),
+                    genDichoMatrix(stage2, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, module_b, 1)),
+                    genDichoMatrix(stage2, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, module_c, 1)),
+                    genDichoMatrix(stage3, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, module_d, 1)),
+                    genDichoMatrix(stage3, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, module_e, 1)),
+                    genDichoMatrix(stage3, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, module_f, 1)),
+                    genDichoMatrix(stage3, model = &quot;1PL&quot;, bPrior = c(&quot;norm&quot;, module_g, 1)))
+  itembank &lt;- as.matrix(itembank)
+
+  return(list(&quot;design&quot; = design, &quot;modules&quot; = modules, &quot;itemBank&quot; = itembank))
+}
+
+testDesigns &lt;- pmap(designParams, mstDesign)</code></pre>
+<p>To run the simulations we’ll create a set of simulated candidates with an ability range between -4 and 4 (stepped in increments of 0.5). Then we’ll repeat for each of the six designs above, using the same item bank.</p>
+<pre class="r"><code>simulation.levels &lt;- seq(-4, 4, 0.5)
+simulation.candidates &lt;- rep(simulation.levels, each = 450)
+simulation.responses &lt;- matrix(NA, length(simulation.candidates), 6)
+simulation.start &lt;- list(theta = 0)
+simulation.test &lt;- list(method = &quot;BM&quot;, moduleSelect = &quot;MFI&quot;)
+simulation.final &lt;- list(method = &quot;BM&quot;)</code></pre>
+<p>We’ll then loop over each design, running the <code>randomMST()</code> function to simulate a test.</p>
+<pre class="r"><code>for (j in 1:6) {
+  for (i in 1:length(simulation.candidates)) {
+    prov &lt;- randomMST(trueTheta = simulation.candidates[i],
+      itemBank = testDesigns[[j]]$itemBank, modules = testDesigns[[j]]$modules,
+      transMatrix = routing, genSeed = i,
+      start = simulation.start, test = simulation.test, final = simulation.final)
+    simulation.responses[i,j] &lt;- prov$thFinal
+  }
+}</code></pre>
+<div id="asb-and-rmse-values" class="section level4">
+<h4>ASB and RMSE values</h4>
+<p>The results can now be graphed. Following <span class="citation">Ippel and Magis (<a href="#ref-ippel2020efficient" role="doc-biblioref">2020</a>)</span>, and <span class="citation">Magis, Yan, and Von Davier (<a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span> we compute the averaged signed bias (ASB) and root mean squared error (RMSE) values for each design and for each ability level. ASB is the mean difference between estimated and true ability levels. RMSE is the square root of the mean of the squared differences between estimated and true ability levels. With both measures, lower is better.</p>
+<pre class="r"><code>simulation.ASB &lt;- simulation.RMSE &lt;- matrix(NA, length(simulation.levels), 6)
+ASB &lt;- function(t, th) mean(t-th)
+RMSE &lt;- function(t, th) sqrt(mean((t-th)^2))
+
+for (i in 1:length(simulation.levels)) {
+  for (j in 1:6) {
+    index &lt;- which(simulation.candidates == simulation.levels[i])
+    simulation.ASB[i,j] &lt;- ASB(simulation.responses[index,j], simulation.candidates[i])
+    simulation.RMSE[i,j] &lt;- RMSE(simulation.responses[index,j], simulation.candidates[i])
+  }
+}
+
+dfASB &lt;- data.frame(simulation.ASB)
+dfASB$theta &lt;- simulation.levels
+
+dfRMSE &lt;- data.frame(simulation.RMSE)
+dfRMSE$theta &lt;- simulation.levels</code></pre>
+<pre class="r"><code>ggplot(data = dfASB, aes(x = theta)) +
+  geom_line(aes(y = X1)) + 
+  geom_line(aes(y = X2)) +
+  geom_line(aes(y = X3)) +
+  geom_line(aes(y = X4)) +
+  geom_line(aes(y = X5)) +
+  geom_line(aes(y = X6)) +
+  geom_hline(yintercept = 0.0, linetype=&quot;dotted&quot;) +
+  labs(x = &quot;theta&quot;, y = &quot;ASB&quot;)</code></pre>
+<div class="figure"><span id="fig:ASB"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/ASB-1.png" alt="ASB" width="672" />
+<p class="caption">
+Figure 1: ASB
+</p>
+</div>
+<pre class="r"><code>ggplot(data = dfRMSE, aes(x = theta)) +
+  geom_line(aes(y = X1)) + 
+  geom_line(aes(y = X2)) +
+  geom_line(aes(y = X3)) +
+  geom_line(aes(y = X4)) +
+  geom_line(aes(y = X5)) +
+  geom_line(aes(y = X6)) +
+  labs(x = &quot;theta&quot;, y = &quot;RMSE&quot;)</code></pre>
+<div class="figure"><span id="fig:RMSE"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/RMSE-1.png" alt="RMSE" width="672" />
+<p class="caption">
+Figure 2: RMSE
+</p>
+</div>
+<p>Both these graphs show that there is no variation between the different designs - they all show a similar pattern, with overestimation for higher ability levels.</p>
+<p>For more details on how to run simulations like this see Chapter 7 of <span class="citation">(Magis, Yan, and Von Davier <a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span>, or check out the <a href="https://cran.r-project.org/web/packages/mstR/index.html">mstR</a> package.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-ippel2020efficient">
+<p>Ippel, Lianne, and David Magis. 2020. “Efficient Standard Errors in Item Response Theory Models for Short Tests.” <em>Educational and Psychological Measurement</em> 80 (3): 461–75.</p>
+</div>
+<div id="ref-magis2017computerized">
+<p>Magis, David, Duanli Yan, and Alina A Von Davier. 2017. <em>Computerized Adaptive and Multistage Testing with R: Using Packages Catr and Mstr</em>. Springer.</p>
+</div>
+</div>
+</div>
