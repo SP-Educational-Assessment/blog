@@ -27,7 +27,7 @@ In later posts I'll cover the following:
 - The development of MSTs
 - The validation of MSTs
   - Test construction
-  - Trialling
+  - Trialing
   - Scoring and routing
 
 As we explore these topics we’ll consider an example *item* which will follow a lifecycle from when it is first conceived, developed, rated and trialled, banked in the item bank, delivered as part of one or more test administrations, and finally retired from use. We will also consider a hypothetical *candidate* and follow their *journey* from being entered to take the test, being routed between the different stages of the test, and receiving a final score and report on their results.

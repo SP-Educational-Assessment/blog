@@ -198,9 +198,9 @@ dfMSTResponse &lt;- randomMST(trueTheta = theta,
 ##                              
 ## Nr     1  2  3  4  5  6  7  8
 ## Item  21 22 23 24 25 26 27 28
-## Resp.  0  0  0  0  0  0  1  0
+## Resp.  1  0  1  0  1  0  0  0
 ## 
-##     Provisional ability estimate (SE) after stage 2: 0.298 (0.439)
+##     Provisional ability estimate (SE) after stage 2: 0.68 (0.437)
 ## 
 ##   Stage 3:
 ##     Module administered: 6 
@@ -210,19 +210,19 @@ dfMSTResponse &lt;- randomMST(trueTheta = theta,
 ##                                    
 ## Nr     1  2  3  4  5  6  7  8  9 10
 ## Item  49 50 51 52 53 54 55 56 57 58
-## Resp.  1  1  1  0  0  1  1  0  0  1
+## Resp.  0  1  0  0  1  1  0  1  1  1
 ## 
-##     Provisional ability estimate (SE) after stage 3: 0.529 (0.366)
+##     Provisional ability estimate (SE) after stage 3: 0.798 (0.367)
 ## 
 ##  Final results: 
 ##    Total length of multistage test: 30 items 
 ##    Final ability estimator: Bayes modal (MAP) estimator 
 ##    Final prior distribution: N(0,1) prior 
-##    Final ability estimate (SE): 0.529 (0.366) 
-##    95% confidence interval: [-0.188,1.247] 
+##    Final ability estimate (SE): 0.798 (0.367) 
+##    95% confidence interval: [0.078,1.518] 
 ## 
 ##  Output was not captured!</code></pre>
-<p>For this simulated candidate with a true <span class="math inline">\(\theta\)</span> of 0.95, the MST has delivered an estimated ability <span class="math inline">\(\hat{\theta}\)</span> of 0.529.</p>
+<p>For this simulated candidate with a true <span class="math inline">\(\theta\)</span> of 0.95, the MST has delivered an estimated ability <span class="math inline">\(\hat{\theta}\)</span> of 0.798.</p>
 <p>The Module Information Function is used to determine the ‘best’ (that is the most informative) module to route to in the next stage. In this case the modules that the candidate was routed to were A, C, F. A plot can be made as follows, showing the highlighted route through the multi-stage test. Note that the output from the <code>randomMST</code> function and the plot use the module and item indices (rather than their labels), so you may want to map these back to a name for ease of interpretation.</p>
 <div class="figure">
 <img src="{{< blogdown/postref >}}index.en_files/figure-html/show%20simulated%20test-1.png" alt="Example routing" width="672" />

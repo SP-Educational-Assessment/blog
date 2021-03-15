@@ -23,9 +23,9 @@ link-citations: yes
 bibliography: references.bib
 ---
 
-# The Development of MSTs
+In the previous post on [previous post](/2021/03/08/ms-primer-1/) we considered some of the design considerations you need to think about when developing a new **multistage test** (MST).
 
-In this part we describe the steps needed for the development of MSTs. Here we turn our attention to initial validation of a test design.
+In this post we'll describe the steps required for the development an MST. In particular we'll look at initial validation of a test design. This post contains some examples of how to perform this validation using R. 
 
 ## Simulation
 
@@ -39,7 +39,7 @@ In order to perform a simulated test, there are a number of different data sourc
 * Modules
 * Panels
 
-In addition to the item information, another data source is used for the candidate information. This forms the candidate information system (CIS) that will be used for the test. In addition to storing a unique candidate ID, additional metadata of interest, such as the candidate's length of study or first language (L1), may be held by the CIS.
+In addition to the item information, another data source is required for storing candidate information. This forms the candidate information system (CIS) that will be used for the test. In addition to storing a unique candidate ID, additional metadata of interest, such as the candidate's length of study or first language (L1), may be held by the CIS.
 
 Finally, test response data is required. Essentially this is a matrix containing rows of candidates and columns of items. Cells in the matrix contain a 1 (item answered correctly) or a 0 (item answered incorrectly). Items that were not presented (for example, from a module that was not in the test path for a candidate) are left blank and are classed as NA.
 
@@ -47,35 +47,36 @@ This data may be stored as flat files (in CSV format for instance), or held in d
 
 ## Pre-Trial Simulation and Design
 
-An initial simulation of the test can be used to experiment with different designs. We show how to do this using the `mstR` library (see @magis2017computerized). Here the aim is to select a set of designs and see if there is an optimal design. It will also help understand how the scoring of the test should be implemented, including the number correct (NC) scores that will be used for routing, and the ability estimates for final scoring and reporting.
+An initial simulation of the test can be used to experiment with different designs. We show how to do this using the `mstR` library (see @magis2017computerized). Here the aim is to select a set of designs and see if there is an optimal one It will also help understand how the scoring of the test should be implemented, including the number correct (NC) scores that will be used for routing, and the ability estimates for final scoring and reporting.
 
 The `mstR` library can take an existing set of item responses, or you can use it to generate a set of randomised simulated item responses. This latter ability is useful in the pre-trial stage where we're interested in finding out how routing between modules should be established, or to validate assumptions in the test design.
 
-The aim here is to sift several different test designs with a view of converging on the optimal design for the . The ability to re-run simulations easily with different design parameters provides a powerful means of trying out different design ideas before incurring the costs of engaging item writers, raters and trial candidates.
+The aim here is to sift through several different test designs with a view of converging on the optimal design for the . The ability to re-run simulations easily with different design parameters provides a powerful means of trying out different design ideas before incurring the costs of engaging item writers, raters and trial candidates.
 
 ### Module Setup
 
 With `mstR` it is possible to define:
 
-* the module topology (number of stages and modules per stage)
+* the module topology (number of stages, and modules per stage)
 * the number of items per module and the average module difficulty
 * the IRT model to use
 
-Assuming the 1-2-4 pattern shown above, with a total of 30 items (12 + 8 + 10), a simulation for the test design can be created from following elements:
+Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/ms-primer-1/), with a total of 30 items (12 + 8 + 10), a simulation for the test design can be created from the following elements:
 
 * a simulated item bank
 * the modules and the items they contain
 * the routing rules in the transition matrix
 
-Average difficulty levels for each module are shown in Figure 5 below (where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed)
+Average difficulty levels for each module are shown in Figure 1 below (where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed)
 
-![MST Design with average difficulty levels](images/module-items.png)
+![Figure 1: MST Design with average difficulty levels](images/module-items.png)
 
 #### The Simulated Item Bank
 
-Here we create in R a set of items `it.MST` that will be used in the analysis with `mstR`. We'll be using randomly generated item difficulties drawn from a normal distribution. First we'll import the R packages we'll need, including `mstR` and the 
+Here we create in R a set of items `it.MST` that will be used in the analysis with `mstR`. We'll be using randomly generated item difficulties drawn from a normal distribution. First we'll import the R packages we'll need, including `mstR`. If you've not used this package before you'll need to install it first by running `install.packages('mstR')`. 
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 library(kableExtra)
 library(tidyverse)
 library(janitor)
@@ -97,6 +98,7 @@ it.MST <- as.matrix(it.MST)
 ```
 
 Here we've decided to use the 1PL (or Rasch) model, so we need to supply `bPrior` difficulty distributions, and convert the data frame into a matrix. The `bPrior` parameter is constructed using a normal distribution with a given $\bar{b}$ and standard deviation of 1.
+
 We'll end up with a matrix of 68 items, each with randomised difficulty parameters.
 
 #### Assigning Items to Modules
@@ -104,7 +106,7 @@ We'll end up with a matrix of 68 items, each with randomised difficulty paramete
 Selecting items into the modules is done by creating another matrix with 68 rows (items) and 7 columns (modules); a cell containing a 1 indicates membership of an item in a module. Because we're using an R matrix to store this information we must use the index of the module (module A = 1, module B = 2, and so on); the code snippet below uses a helper function called `module()` to map from names to indices.
 
 ```{r module items, echo=TRUE}
-# create a function to map module names to indices
+# create the `module` function to map module names to indices
 moduleIndices <- seq(1:7)
 moduleNames <- c('A', 'B', 'C', 'D', 'E', 'F', 'G')
 names(moduleIndices) <- moduleNames
@@ -122,9 +124,13 @@ modules[59:68, module('G')] <- 1
 
 #### Module Routing
 
-The final part of the design activity is construction of the routing paths and cut-offs used for next module selection. This is done by creating an $R \times R$ *transition matrix* which shows the valid paths to modules in the next stage (where $R$ is the number of modules). A value of 1 in the `routing` matrix in the code sample below indicates that a path exists from module $i$ to module $j$. To use the example below the rule `routing[module('A'), module('B'):module('C')] <- 1` means module A routes to modules B and C.
+The final part of the design activity is construction of the routing paths and cut-offs used for next module selection. This is done by creating an $R \times R$ *transition matrix* which shows the valid paths to modules in the next stage (where $R$ is the number of modules). A value of 1 in the `routing` matrix in the code sample below indicates that a path exists from module $i$ to module $j$. To use the example below the rule 
 
-In addition to the routing paths, a set of cut-off criteria must be given. These are expressed in terms of $\hat{\theta}$ using the `cutoff` matrix (see below). To use an example here, the rule `cutoff[module('B'),] <- c(-Inf, 0.0)` means that candidates with ability estimates from minus infinity to zero will be routed to module B. The rule `cutoff[module('C'),] <- c(0.0, Inf)` means that candidates with ability estimates from zero to positive infinity will be routed to module C.
+`routing[module('A'), module('B'):module('C')] <- 1`
+
+means module A routes to modules B and C.
+
+In addition to the routing paths, a set of cut-off criteria must be given. These are expressed in terms of the ability estimate $\hat{\theta}$ using the `cutoff` matrix (see below). To use an example here, the rule `cutoff[module('B'),] <- c(-Inf, 0.0)` means that candidates with ability estimates from minus infinity to zero will be routed to module B. The rule `cutoff[module('C'),] <- c(0.0, Inf)` means that candidates with ability estimates from zero to positive infinity will be routed to module C.
 
 ```{r module routing, echo=TRUE}
 routing <- matrix(0, 7, 7)
@@ -147,7 +153,7 @@ As can be seen, module D to module G are final stage modules, so do not route on
 
 ### Test Simulation
 
-Having created a simulated item bank for the design, it is possible to generate simulated item responses by selecting a $\theta$ for a simulated candidate and running the `genPattern()` function to return a set of simulated item responses:
+Having created a simulated item bank for the design, it is possible to generate simulated item responses by selecting a $\theta$ (theta) for a simulated candidate and running the `genPattern()` function to return a set of simulated item responses:
 
 ```{r simulated test response, echo=TRUE}
 theta <- 0.95
@@ -157,7 +163,7 @@ dfSampleResponse <- genPattern(theta, it.MST)
 (dfSampleResponse)
 ```
 
-Here we use a $\theta$ of `r theta` for our hypothetical candidate as an example. Note that this doesn't really simulate a true MST test, as it ignores the routing rules and simply returns a response for all items in the simulated item bank. We can however use the `randomMST()` function to perform a more realistic simulation. The `randomMST()` function will generate a response pattern for a given simulated item bank, an MST structure, and a true ability level ($\theta$). We'll use Bayesian model estimation (`"BM"`) for ability estimation (this is the default ability estimation method for the `mstR` library). The maximum Fisher information criterion (`"MFI"`) for is used for module selection; again this is the default. The Fisher information is the measure of the amount of information that item $X$ carries about the unknown ability parameter $\theta$.
+Here we use a $\theta$ of `r theta` for our hypothetical candidate as an example. Note that this doesn't really simulate a true MST test, as it ignores the routing rules and simply returns a response for all items in the simulated item bank. We can however use the `randomMST()` function in the `mstR` package to perform a more realistic simulation. The `randomMST()` function will generate a response pattern for a given simulated item bank, an MST structure, and a true ability level ($\theta$). We'll use Bayesian model estimation (`"BM"`) for ability estimation (this is the default ability estimation method for the `mstR` library). The maximum Fisher information criterion (`"MFI"`) is used for module selection; again this is the default. The Fisher information is the measure of the amount of information that item $X$ carries about the unknown ability parameter $\theta$.
 
 ```{r simulated MST test response, echo=TRUE}
 start <- list(theta = theta)
@@ -174,9 +180,11 @@ dfMSTResponse <- randomMST(trueTheta = theta,
 
 For this simulated candidate with a true $\theta$ of `r dfMSTResponse$trueTheta`, the MST has delivered an estimated ability $\hat{\theta}$ of `r dfMSTResponse$thFinal`. 
 
-The Module Information Function is used to determine the 'best' (that is the most informative) module to route to in the next stage. In this case the modules that the candidate was routed to were `r names(moduleIndices[dfMSTResponse$selected.modules])`. A plot can be made as follows, showing the highlighted route through the multi-stage test. Note that the output from the `randomMST` function and the plot use the module and item indices (rather than their labels), so you may want to map these back to a name for ease of interpretation.
+The Module Information Function is used to determine the 'best' (that is the most informative) module to route to in the next stage. In this case the modules that the candidate was routed to were `r names(moduleIndices[dfMSTResponse$selected.modules])`. 
 
-```{r show simulated test, echo=FALSE, fig.cap="Example routing", message=FALSE}
+A plot can be made as follows, showing the highlighted route through the multi-stage test. Note that the output from the `randomMST` function and the plot use the module and item indices (rather than their labels), so you may want to map these back to a name for ease of interpretation.
+
+```{r show simulated test, echo=TRUE, fig.cap="Example routing", message=FALSE}
 plot(dfMSTResponse)
 ```
 
@@ -198,10 +206,12 @@ displayParams <- designParams %>%
 
 kbl(displayParams, caption = 'MST design paramaters')  %>%
   kable_styling() %>%
-  add_header_above(c(" ", "Stage" = 3, "Module" = 7))
+  add_header_above(c(" ", "Stage (n)" = 3, "Module (b)" = 7))
 ```
 
-We define the `mstDesign()` function to generate the set of test designs we want to investigate. This function varies the number of items for each module by stage and can be repeatedly applied to a set of designs which we load in from a CSV file. The `mstDesign()` function effectively generates multiple variants of the test design.
+Here **Stage (n)** is the number of items in each stage of the MST, and **Module (b)** is the target mean difficulty for each module.
+
+We define the `mstDesign()` function to generate the set of test designs (1-6) we want to investigate. This function varies the number of items for each module by stage and can be repeatedly applied to a set of designs which we load in from a CSV file. The `mstDesign()` function effectively generates multiple variants of the test design.
 
 ```{r MST designs}
 mstDesign <- function(design, stage1, stage2, stage3,
@@ -311,7 +321,7 @@ ggplot(data = dfRMSE, aes(x = theta)) +
   labs(x = "theta", y = "RMSE")
 ```
 
-Both these graphs show that there is no variation between the different designs - they all show a similar pattern, with overestimation for higher ability levels.
+Both these graphs show that there is no variation between the different designs - they all show a similar pattern, with overestimation for higher ability levels. At this stage we may want to vary other aspects of the design (for example increasing the number of items, varying the cutoffs used for routing, or modifying the module difficulties). This process can be iterated on until we are happy that there are no further improvements we can make.
 
 For more details on how to run simulations like this see Chapter 7 of [@magis2017computerized], or check out the [mstR](https://cran.r-project.org/web/packages/mstR/index.html) package.
 
