@@ -129,23 +129,11 @@ The final part of the design activity is construction of the routing paths and c
 
 means module A routes to modules B and C.
 
-In addition to the routing paths, a set of cut-off criteria must be given. These are expressed in terms of the ability estimate $\hat{\theta}$ using the `cutoff` matrix (see below). To use an example here, the rule `cutoff[module('B'),] <- c(-Inf, 0.0)` means that candidates with ability estimates from minus infinity to zero will be routed to module B. The rule `cutoff[module('C'),] <- c(0.0, Inf)` means that candidates with ability estimates from zero to positive infinity will be routed to module C.
-
 ```{r module routing, echo=TRUE}
 routing <- matrix(0, 7, 7)
 routing[module('A'), module('B'):module('C')] <- 1
 routing[module('B'), module('D'):module('F')] <- 1
 routing[module('C'), module('E'):module('G')] <- 1
-
-cutoff <- matrix(NA, 7, 2)
-cutoff[module('B'),] <- c(-Inf, 0.0)
-cutoff[module('C'),] <- c(0.0, Inf)
-cutoff[module('D'),] <- c(-Inf, -1.0)
-cutoff[module('E'),] <- c(-1.0, 0.0)
-cutoff[module('F'),] <- c(0.0, 1.0)
-cutoff[module('G'),] <- c(1.0, Inf)
-
-(cutoff)
 ```
 
 As can be seen, module D to module G are final stage modules, so do not route onward.
@@ -210,7 +198,7 @@ kbl(displayParams, caption = 'MST design paramaters')  %>%
 
 Here **Stage (n)** is the number of items in each stage of the MST, and **Module (b)** is the target mean difficulty for each module.
 
-We define the `mstDesign()` function to generate the set of test designs (1-6) we want to investigate. This function varies the number of items for each module by stage and can be repeatedly applied to a set of designs which we load in from a CSV file. The `mstDesign()` function effectively generates multiple variants of the test design.
+We define the `mstDesign()` function to generate the set of test designs we want to investigate. This function varies the number of items for each module by stage and can be repeatedly applied to a set of designs which we load in from a CSV file. The separation of the R code from the design parameters makes it easier to re-run simulations with different parameters and reduces likelihood of errors. The `mstDesign()` function effectively generates multiple variants of the test design based on this CSV input, with the `pmap()` function allowing us to apply `mstDesign()` to each row in the CSV.
 
 ```{r MST designs}
 mstDesign <- function(design, stage1, stage2, stage3,
@@ -277,52 +265,59 @@ for (j in 1:6) {
 
 The results can now be graphed. Following @ippel2020efficient, and @magis2017computerized we compute the averaged signed bias (ASB) and root mean squared error (RMSE) values for each design and for each ability level. ASB is the mean difference between estimated and true ability levels. RMSE is the square root of the mean of the squared differences between estimated and true ability levels. With both measures, lower is better.
 
+In the following code snippet we define the `ASB()` and `RMSE()` functions, and then apply them repeatedly over the simulation results to build up data frames for the ASB and RMSE statistic so that we can run a comparison plot for each design.
+
+
 ```{r simulation results}
-simulation.ASB <- simulation.RMSE <- matrix(NA, length(simulation.levels), 6)
+simulation.ASB <- simulation.RMSE <- matrix(NA, length(simulation.levels), length(testDesigns))
 ASB <- function(t, th) mean(t-th)
 RMSE <- function(t, th) sqrt(mean((t-th)^2))
 
 for (i in 1:length(simulation.levels)) {
-  for (j in 1:6) {
+  for (j in 1:length(testDesigns)) {
     index <- which(simulation.candidates == simulation.levels[i])
-    simulation.ASB[i,j] <- ASB(simulation.responses[index,j], simulation.candidates[i])
-    simulation.RMSE[i,j] <- RMSE(simulation.responses[index,j], simulation.candidates[i])
+    simulation.ASB[i,j] <- ASB(simulation.responses[index,j], simulation.levels[i])
+    simulation.RMSE[i,j] <- RMSE(simulation.responses[index,j], simulation.levels[i])
   }
 }
 
 dfASB <- data.frame(simulation.ASB)
-dfASB$theta <- simulation.levels
+dfASB$levels <- simulation.levels
 
 dfRMSE <- data.frame(simulation.RMSE)
-dfRMSE$theta <- simulation.levels
+dfRMSE$levels <- simulation.levels
 ```
 
 ```{r ASB, fig.cap="ASB"}
-ggplot(data = dfASB, aes(x = theta)) +
-  geom_line(aes(y = X1)) + 
-  geom_line(aes(y = X2)) +
-  geom_line(aes(y = X3)) +
-  geom_line(aes(y = X4)) +
-  geom_line(aes(y = X5)) +
-  geom_line(aes(y = X6)) +
+designIDs <- unlist(map(testDesigns, function(x) x$design))
+colnames(dfASB) <- append(as.character(designIDs), 'theta')
+visASB <- dfASB %>%
+  pivot_longer(!theta, names_to = "design", values_to = "ASB")
+
+cdPalette <- c("#2F4C9C", "#041542", "#E6B632", "#6B0954", "#F562D3", "#52C46D")
+
+ggplot(data = visASB, aes(x = theta, y = ASB)) +
+  geom_line(aes(colour=design)) +
   geom_hline(yintercept = 0.0, linetype="dotted") +
-  labs(x = "theta", y = "ASB")
+  labs(x = "theta", y = "ASB") +
+  scale_colour_manual(values=cdPalette)
 ```
 
 ```{r RMSE, fig.cap="RMSE"}
-ggplot(data = dfRMSE, aes(x = theta)) +
-  geom_line(aes(y = X1)) + 
-  geom_line(aes(y = X2)) +
-  geom_line(aes(y = X3)) +
-  geom_line(aes(y = X4)) +
-  geom_line(aes(y = X5)) +
-  geom_line(aes(y = X6)) +
-  labs(x = "theta", y = "RMSE")
+colnames(dfRMSE) <- append(as.character(designIDs), 'theta')
+visRMSE <- dfRMSE %>%
+  pivot_longer(!theta, names_to = "design", values_to = "RMSE")
+
+ggplot(data = visRMSE, aes(x = theta, y = RMSE)) +
+  geom_line(aes(colour=design)) +
+  labs(x = "theta", y = "RMSE") +
+  scale_colour_manual(values=cdPalette)
 ```
 
-Both these graphs show that there is no variation between the different designs - they all show a similar pattern, with overestimation for higher ability levels. At this stage we may want to vary other aspects of the design (for example increasing the number of items, varying the cutoffs used for routing, or modifying the module difficulties). This process can be iterated on until we are happy that there are no further improvements we can make.
+Both these graphs show that there is very little variation between the different designs - they all show a similar pattern, with overestimation for very low and very high ability levels. If anything, designs 4 and 5 appear to give the least bias and error (especially around the zero theta point). These designs both have 12 items in the final stage module; so this is potentially an avenue worth investigating - increasing the number of items in the final stage is the best approach. Further simulations can be run to look into this.
 
 For more details on how to run simulations like this see Chapter 7 of [@magis2017computerized], or check out the [mstR](https://cran.r-project.org/web/packages/mstR/index.html) package.
 
-# References
+
+## References
 
