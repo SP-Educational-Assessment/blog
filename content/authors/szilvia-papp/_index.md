@@ -66,6 +66,9 @@ social:
 - icon: github
   icon_pack: fab
   link: https://github.com/szilvip
+- icon: linkedin
+  icon_pack: fab
+  link: https://www.linkedin.com/in/szilvia-papp-599b0526/
 ---
 
 I deliver professional consultancy services in educational and language assessment for publishers, assessment boards, international consortia, Ministries of Education, universities, and testing agencies. I work within the team who has developed and is delivering the new blended (online and face-to-face) Masters level course in Educational Assessment and Examinations at the Faculty of Education of the University of Cambridge. I have written course materials and am supervising students on this course.

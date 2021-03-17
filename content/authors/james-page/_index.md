@@ -14,7 +14,7 @@ organizations:
   url: "https://www.speduconsulting.co.uk/"
 
 # Short bio (displayed in user profile at end of posts)
-bio: I am an experienced NLP specialist who has worked in a variety of roles including software engineering, technical pre-sales and product management. For the last five years I've worked in a number of Agile product development environments ,and I enjoy working with cross-functional teams to deliver great products that users love. I have an interest in using IRT to help develop language assessments, and applying machine learning techniques to support assessment and language learning.
+bio: I'm a qualified NLP specialist who has worked in a variety of roles including software engineering, technical pre-sales and product management. For the last five years I've worked in a number of Agile product development environments, and I enjoy working with cross-functional teams to deliver great products that users love. I have an interest in using IRT to help develop language assessments, and applying machine learning techniques to support assessment and language learning.
 
 education:
   courses:
@@ -49,4 +49,4 @@ social:
   link: https://www.linkedin.com/in/james-page-101/
 ---
 
-I am an experienced NLP specialist who has worked in a variety of roles including software engineering, technical pre-sales and product management. For the last five years I've worked in a number of Agile product development environments ,and I enjoy working with cross-functional teams to deliver great products that users love. I have an interest in using IRT to help develop language assessments, and applying machine learning techniques to support assessment and language learning.
+I'm a qualified NLP specialist who has worked in a variety of roles including software engineering, technical pre-sales and product management. For the last five years I've worked in a number of Agile product development environments, and I enjoy working with cross-functional teams to deliver great products that users love. I have an interest in using IRT to help develop language assessments, and applying machine learning techniques to support assessment and language learning.
