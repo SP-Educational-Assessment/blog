@@ -86,7 +86,7 @@ knitr::include_graphics("images/module-items.png")
 
 Here we create in R a set of items `it.MST` that will be used in the analysis with `mstR`. We'll be using randomly generated item difficulties drawn from a normal distribution. First we'll import the R packages we'll need, including `mstR`. If you've not used this package before you'll need to install it first by running `install.packages('mstR')`. 
 
-```{r module difficulties, echo=TRUE}
+```{r module-difficulties, echo=TRUE}
 library(mstR)
 options(scipen = 1, digits = 3)
 
@@ -108,7 +108,7 @@ We'll end up with a matrix of 68 items, each with randomised difficulty paramete
 
 Selecting items into the modules is done by creating another matrix with 68 rows (items) and 7 columns (modules); a cell containing a 1 indicates membership of an item in a module. Because we're using an R matrix to store this information we must use the index of the module (module A = 1, module B = 2, and so on); the code snippet below uses a helper function called `module()` to map from names to indices.
 
-```{r module items, echo=TRUE}
+```{r module-items, echo=TRUE}
 # create the `module` function to map module names to indices
 moduleIndices <- seq(1:7)
 moduleNames <- c('A', 'B', 'C', 'D', 'E', 'F', 'G')
@@ -133,7 +133,7 @@ The final part of the design activity is construction of the routing paths and c
 
 means module A routes to modules B and C.
 
-```{r module routing, echo=TRUE}
+```{r module-routing, echo=TRUE}
 routing <- matrix(0, 7, 7)
 routing[module('A'), module('B'):module('C')] <- 1
 routing[module('B'), module('D'):module('F')] <- 1
@@ -146,7 +146,7 @@ As can be seen, module D to module G are final stage modules, so do not route on
 
 Having created a simulated item bank for the design, it is possible to generate simulated item responses by selecting a $\theta$ (theta) for a simulated candidate and running the `genPattern()` function to return a set of simulated item responses:
 
-```{r simulated test response, echo=TRUE}
+```{r simulated-test-response, echo=TRUE}
 theta <- 0.95
 
 dfSampleResponse <- genPattern(theta, it.MST)
@@ -156,7 +156,7 @@ dfSampleResponse <- genPattern(theta, it.MST)
 
 Here we use a $\theta$ of `r theta` for our hypothetical candidate as an example. Note that this doesn't really simulate a true MST test, as it ignores the routing rules and simply returns a response for all items in the simulated item bank. We can however use the `randomMST()` function in the `mstR` package to perform a more realistic simulation. The `randomMST()` function will generate a response pattern for a given simulated item bank, an MST structure, and a true ability level ($\theta$). We'll use Bayesian model estimation (`"BM"`) for ability estimation (this is the default ability estimation method for the `mstR` library). The maximum Fisher information criterion (`"MFI"`) is used for module selection; again this is the default. The Fisher information is the measure of the amount of information that item $X$ carries about the unknown ability parameter $\theta$.
 
-```{r simulated MST test response, echo=TRUE}
+```{r simulated-MST-test-response, echo=TRUE}
 start <- list(theta = theta)
 test <- list(method = "BM", moduleSelect = "MFI")
 final <- list(method = "BM")
@@ -175,7 +175,7 @@ The Module Information Function is used to determine the 'best' (that is the mos
 
 A plot can be made as follows, showing the highlighted route through the multi-stage test. Note that the output from the `randomMST` function and the plot use the module and item indices (rather than their labels), so you may want to map these back to a name for ease of interpretation.
 
-```{r echo=TRUE, fig.cap="Example routing", message=FALSE, warning=FALSE}
+```{r plot-mst, echo=TRUE, fig.cap="Example routing", message=FALSE, warning=FALSE}
 plot(dfMSTResponse)
 ```
 
@@ -204,7 +204,7 @@ Here **Stage (n)** is the number of items in each stage of the MST, and **Module
 
 We define the `mstDesign()` function to generate the set of test designs we want to investigate. This function varies the number of items for each module by stage and can be repeatedly applied to a set of designs which we load in from a CSV file. The separation of the R code from the design parameters makes it easier to re-run simulations with different parameters and reduces likelihood of errors. The `mstDesign()` function effectively generates multiple variants of the test design based on this CSV input, with the `pmap()` function allowing us to apply `mstDesign()` to each row in the CSV.
 
-```{r MST designs}
+```{r MST-designs}
 mstDesign <- function(design, stage1, stage2, stage3,
                       module_a, module_b, module_c, module_d, module_e, module_f, module_g) {
   matrixN <- stage1 + (2 * stage2) + (4 * stage3)
@@ -242,7 +242,7 @@ testDesigns <- pmap(designParams, mstDesign)
 
 To run the simulations we'll create a set of simulated candidates with an ability range between -4 and 4 (stepped in increments of 0.5). Then we'll repeat for each of the six designs above, using the same item bank.
 
-```{r setup simulation}
+```{r setup-simulation}
 simulation.levels <- seq(-4, 4, 0.5)
 simulation.candidates <- rep(simulation.levels, each = 450)
 simulation.responses <- matrix(NA, length(simulation.candidates), 6)
@@ -253,7 +253,7 @@ simulation.final <- list(method = "BM")
 
 We'll then loop over each design, running the `randomMST()` function to simulate a test.
 
-```{r simulate tests}
+```{r simulate-tests}
 for (j in 1:6) {
   for (i in 1:length(simulation.candidates)) {
     prov <- randomMST(trueTheta = simulation.candidates[i],
@@ -272,7 +272,7 @@ The results can now be graphed. Following @ippel2020efficient, and @magis2017com
 In the following code snippet we define the `ASB()` and `RMSE()` functions, and then apply them repeatedly over the simulation results to build up data frames for the ASB and RMSE statistic so that we can run a comparison plot for each design.
 
 
-```{r simulation results}
+```{r ASB-RMSE}
 simulation.ASB <- simulation.RMSE <- matrix(NA, length(simulation.levels), length(testDesigns))
 ASB <- function(t, th) mean(t-th)
 RMSE <- function(t, th) sqrt(mean((t-th)^2))
@@ -292,7 +292,7 @@ dfRMSE <- data.frame(simulation.RMSE)
 dfRMSE$levels <- simulation.levels
 ```
 
-```{r ASB, fig.cap="ASB"}
+```{r ASB-vis, fig.cap="ASB"}
 designIDs <- unlist(map(testDesigns, function(x) x$design))
 colnames(dfASB) <- append(as.character(designIDs), 'theta')
 visASB <- dfASB %>%
@@ -307,7 +307,7 @@ ggplot(data = visASB, aes(x = theta, y = ASB)) +
   scale_colour_manual(values=cdPalette)
 ```
 
-```{r RMSE, fig.cap="RMSE"}
+```{r RMSE-vis, fig.cap="RMSE"}
 colnames(dfRMSE) <- append(as.character(designIDs), 'theta')
 visRMSE <- dfRMSE %>%
   pivot_longer(!theta, names_to = "design", values_to = "RMSE")
