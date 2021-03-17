@@ -19,11 +19,12 @@ image:
   focal_point: ''
   preview_only: no
 projects: []
+authors: [ 'james-page' ]
 link-citations: yes
 bibliography: references.bib
 ---
 
-In the previous post on [previous post](/2021/03/08/ms-primer-1/) we considered some of the design considerations you need to think about when developing a new **multistage test** (MST).
+In the previous post on [previous post](/2021/03/08/mst-primer-1/) we considered some of the design considerations you need to think about when developing a new **multistage test** (MST).
 
 In this post we'll describe the steps required for the development an MST. In particular we'll look at initial validation of a test design. This post contains some examples of how to perform this validation using R. 
 
@@ -61,7 +62,7 @@ With `mstR` it is possible to define:
 * the number of items per module and the average module difficulty
 * the IRT model to use
 
-Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/ms-primer-1/), with a total of 30 items (12 + 8 + 10), a simulation for the test design can be created from the following elements:
+Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/mst-primer-1/), with a total of 30 items (12 + 8 + 10), a simulation for the test design can be created from the following elements:
 
 * a simulated item bank
 * the modules and the items they contain
@@ -69,7 +70,7 @@ Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/ms-prime
 
 Average difficulty levels for each module are shown in Figure \@ref(fig:module-items), where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed.
 
-```{r module-items, fig.cap = "MST Design with average difficulty levels"}
+```{r module-items, fig.cap = "MST Design with average difficulty levels", echo=FALSE}
 knitr::include_graphics("images/module-items.png")
 ```
 

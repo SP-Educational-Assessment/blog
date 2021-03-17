@@ -32,7 +32,7 @@ RStudio comes with a useful Addin that makes it relatively straightforward to ad
 To build and serve the blog on your local development environment, first run the `build_site()` command from the RStudio console:
 
 ```r
-blogdown::build_site()
+blogdown::build_site(build_rmd = TRUE)
 ```
 
 Then you can then run the `serve_site()` command to start a local webserver and view the blog in a browser (it's recommended to use a real browser when testing locally rather than RStudio's built-in viewer):
