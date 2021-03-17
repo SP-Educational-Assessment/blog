@@ -24,13 +24,21 @@ link-citations: yes
 bibliography: references.bib
 ---
 
-In the previous post on [previous post](/2021/03/08/mst-primer-1/) we considered some of the design considerations you need to think about when developing a new **multistage test** (MST).
+```{r setup, include=FALSE}
+library(kableExtra)
+library(tidyverse)
+library(janitor)
 
-In this post we'll describe the steps required for the development an MST. In particular we'll look at initial validation of a test design. This post contains some examples of how to perform this validation using R. 
+knitr::opts_chunk$set(
+  comment = '', fig.width = 6, fig.height = 6
+)
+```
+
+In this post we'll describe the steps required for the development of a computerised multistage test (MST). In particular we'll look at initial validation of a test design. The [previous post](/2021/03/08/mst-primer-1/) considered some of the design considerations you need to think about when developing a new **multistage test** (MST). This post shows some examples of how to perform this validation using R. 
 
 ## Simulation
 
-In the pre-trial stage, it is useful to run simulations to help us answer the questions posed in the previous part of this article. The results of these simulations will help inform final decisions about the test design. It's always less expensive to make modifications to a design early on in the process, before significant investment in item writing and trialling has been made. The ability to simulate a test at the design phase can be used to understand the constraints of the design at an early stage and make changes in a low-cost, low-risk way. In this section we'll show how the `mstR` R package can be used to run simulations for a MST design. First though we'll cover the data sources that we'll be using.
+In the pre-trial stage, it is useful to run simulations to help us answer the questions posed in the previous part of this article. The results of these simulations will help inform final decisions about the test design. It's always less expensive to make modifications to a design early on in the process, before significant investment in item writing and trialling has been made. The ability to simulate a test at the design phase can be used to understand the constraints of the design at an early stage and make changes in a low-cost, low-risk way. In this post we'll show how the [`mstR` R package](https://cran.r-project.org/web/packages/mstR/) can be used to run simulations for a MST design. First though we'll cover the data sources that we'll be using.
 
 ## Data Sources and Management
 
@@ -70,20 +78,13 @@ Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/mst-prim
 
 Average difficulty levels for each module are shown in Figure \@ref(fig:module-items), where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed.
 
-```{r module-items, fig.cap = "MST Design with average difficulty levels", echo=FALSE}
+```{r module-items, echo=FALSE, fig.cap="MST Design with average difficulty levels"}
 knitr::include_graphics("images/module-items.png")
 ```
 
 #### The Simulated Item Bank
 
 Here we create in R a set of items `it.MST` that will be used in the analysis with `mstR`. We'll be using randomly generated item difficulties drawn from a normal distribution. First we'll import the R packages we'll need, including `mstR`. If you've not used this package before you'll need to install it first by running `install.packages('mstR')`. 
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = TRUE)
-library(kableExtra)
-library(tidyverse)
-library(janitor)
-```
 
 ```{r module difficulties, echo=TRUE}
 library(mstR)
