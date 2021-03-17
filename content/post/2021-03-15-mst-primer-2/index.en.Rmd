@@ -67,9 +67,11 @@ Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/ms-prime
 * the modules and the items they contain
 * the routing rules in the transition matrix
 
-Average difficulty levels for each module are shown in Figure 1 below (where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed)
+Average difficulty levels for each module are shown in Figure \@ref(fig:module-items), where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed.
 
-![Figure 1: MST Design with average difficulty levels](images/module-items.png)
+```{r module-items, fig.cap = "MST Design with average difficulty levels"}
+knitr::include_graphics("images/module-items.png")
+```
 
 #### The Simulated Item Bank
 
@@ -171,7 +173,7 @@ The Module Information Function is used to determine the 'best' (that is the mos
 
 A plot can be made as follows, showing the highlighted route through the multi-stage test. Note that the output from the `randomMST` function and the plot use the module and item indices (rather than their labels), so you may want to map these back to a name for ease of interpretation.
 
-```{r show simulated test, echo=TRUE, fig.cap="Example routing", message=FALSE}
+```{r echo=TRUE, fig.cap="Example routing", message=FALSE, warning=FALSE}
 plot(dfMSTResponse)
 ```
 
@@ -314,7 +316,7 @@ ggplot(data = visRMSE, aes(x = theta, y = RMSE)) +
   scale_colour_manual(values=cdPalette)
 ```
 
-Both these graphs show that there is very little variation between the different designs - they all show a similar pattern, with overestimation for very low and very high ability levels. If anything, designs 4 and 5 appear to give the least bias and error (especially around the zero theta point). These designs both have 12 items in the final stage module; so this is potentially an avenue worth investigating - increasing the number of items in the final stage is the best approach. Further simulations can be run to look into this.
+Both these graphs show that there is very little variation between the different designs - they all show a similar pattern, with overestimation for very low and very high ability levels. If anything, designs 4 and 5 appear to give the least bias and error (especially around the zero theta point). These designs both have 12 items in the final stage module; so this is potentially an avenue worth investigating - increasing the number of items in the final stage may be the best approach. Further simulations can be run to look into this.
 
 For more details on how to run simulations like this see Chapter 7 of [@magis2017computerized], or check out the [mstR](https://cran.r-project.org/web/packages/mstR/index.html) package.
 
