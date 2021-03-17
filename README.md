@@ -32,7 +32,7 @@ RStudio comes with a useful Addin that makes it relatively straightforward to ad
 To build and serve the blog on your local development environment, first run the `build_site()` command from the RStudio console:
 
 ```r
-blogdown::build_site()
+blogdown::build_site(build_rmd = TRUE)
 ```
 
 Then you can then run the `serve_site()` command to start a local webserver and view the blog in a browser (it's recommended to use a real browser when testing locally rather than RStudio's built-in viewer):
@@ -47,10 +47,10 @@ Once you're happy you can then run the blog in an Apache webserver to test how i
 
 There are a set of Docker build scripts that can be run so that you can view the blog running in an Apache webserver (current Apache version 2.4 is used). This is useful if you want to run it on a staging server.
 
-* docker-build.sh (build the container image)
-* docker-run.sh (run the container, navigate to <https://localhost> to view the website)
-* docker-clean.sh (get rid of the container)
-* docker-save.sh (saves the container image to the file speduas-blog-image.tar)
+- docker-build.sh (build the container image)
+- docker-run.sh (run the container, navigate to <https://localhost> to view the website)
+- docker-clean.sh (get rid of the container)
+- docker-save.sh (saves the container image to the file speduas-blog-image.tar)
 
 If you want to move the container to a different host you can copy the speduas-blog-image.tar file, and then load it on the other host. To do this, run the `docker-build.sh` and `docker-save.sh` scripts in sequence to create a new `speduas-blog-image.tar` image file. Then copy this file over to the host you want to run it on (using `scp` or `rsync` for instance).
 

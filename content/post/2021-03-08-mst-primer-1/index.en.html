@@ -1,31 +1,26 @@
 ---
-title: The Practical Application of Computerised Multistage Tests
-author: R package build
+title: "The Practical Application of Computerised Multistage Tests"
+author: "James Page"
 date: '2021-03-08'
 slug: mst-primer-1
-categories:
-  - R
 tags:
-  - irt
-subtitle: 'A practical guide to the design and development of computerised multistage tests'
+- irt
+- mst
+- rasch
+subtitle: A practical guide to the design and development of computerised multistage
+  tests
 summary: ''
-authors: [ 'James Page' ]
 lastmod: '2021-03-08T20:49:06Z'
-math: true
+math: yes
 featured: yes
-image:
-  caption: ''
-  focal_point: ''
-  preview_only: no
 projects: []
-link-citations: true
-bibliography: [ references.bib ]
+authors: [ 'james-page' ]
+link-citations: yes
+bibliography: references.bib
 ---
 
 
 
-<div id="overview" class="section level2">
-<h2>Overview</h2>
 <p>Computerised multistage tests (MSTs) have grown in popularity in recent years due to their advantages of flexibility and simplicity over linear and computerised adaptive tests (CATs). A growing body of academic literature is available for researchers, however the practicalities of using MST for the design and delivery of real-world tests is still difficult to access.</p>
 <p>In this series of posts that I hope to provide a useful practical guide to test design and delivery. The first post will cover the <strong>initial design</strong> of these types of test.</p>
 <p>In later posts I’ll cover the following:</p>
@@ -34,14 +29,13 @@ bibliography: [ references.bib ]
 <li>The validation of MSTs
 <ul>
 <li>Test construction</li>
-<li>Trialling</li>
+<li>Trialing</li>
 <li>Scoring and routing</li>
 </ul></li>
 </ul>
 <p>As we explore these topics we’ll consider an example <em>item</em> which will follow a lifecycle from when it is first conceived, developed, rated and trialled, banked in the item bank, delivered as part of one or more test administrations, and finally retired from use. We will also consider a hypothetical <em>candidate</em> and follow their <em>journey</em> from being entered to take the test, being routed between the different stages of the test, and receiving a final score and report on their results.</p>
-</div>
-<div id="the-design-of-msts" class="section level1">
-<h1>The Design of MSTs</h1>
+<div id="the-design-of-msts" class="section level2">
+<h2>The Design of MSTs</h2>
 <p>The advantages of splitting tests up into units of items called <em>modules</em> and directing candidates to these modules based on their latent ability estimates provides a more efficient test delivery than a corresponding linear test, whilst also offering an easier method of assembly, and greater protection against test copying.</p>
 <p>We’ll assume some familiarity with Item Response Theory (IRT) - and the Rasch model. Some knowledge of programming with R would be useful to understand the examples given. For background information and primers on these subjects we provide references.</p>
 <p>The main focus is the development of tests for language learners, specifically English language learners. The theory and data processing involved can be transferred to other domains that require measurement of latent ability. The IRT model that we focus on is the 1PL (or Rasch) model. For readers interested in extending analysis to more complex models, see <span class="citation">Magis, Yan, and Von Davier (<a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span>.</p>
@@ -58,19 +52,19 @@ bibliography: [ references.bib ]
 </ul>
 <p>See Chapter 1 of <span class="citation">Lane, Raymond, and Haladyna (<a href="#ref-lane2015handbook" role="doc-biblioref">2015</a>)</span> for a concise introduction to the main considerations of developing a new test.</p>
 <p>Once the live test has been launched, continual monitoring and adjustment of the test will be essential to ensure that it remains secure and delivers on the targeted goals over the long term.</p>
-<div id="constraints-and-assumptions" class="section level2">
-<h2>Constraints and Assumptions</h2>
+<div id="constraints-and-assumptions" class="section level3">
+<h3>Constraints and Assumptions</h3>
 <p>This article focuses on practical solutions to problems that may be encountered during a test design. Lack of sufficient data, particularly in the early stages of design, is a perennial problem. The ability to validate the design at an early stage with simulated data is therefore important and will be covered here.</p>
 <p>In addition, the test delivery system may be restricted in its ability to access the item bank to derive item difficulties. In this case, mapping functions to derive ability estimates and scale scores as well as provision of the cut scores for module routing must be provided in advance of test administration for each panel. We demonstrate methods that can be used to provide these values.</p>
 </div>
-<div id="introduction-to-item-response-theory" class="section level2">
-<h2>Introduction to Item Response Theory</h2>
+<div id="introduction-to-item-response-theory" class="section level3">
+<h3>Introduction to Item Response Theory</h3>
 <p>When you deliver a test to a set of candidates, how can you be sure that you are measuring those candidates in the same way, even though the test administrated to one candidate has different items from that administered to another candidate?</p>
 <p>The underlying theoretical basis for MST is the branch of psychometrics known as Item Response Theory, or IRT. The theory proposes that there are <em>latent traits</em> (for example language ability) that can be measured using a set of items delivered to the test candidate. These test items are typically scored as correct (1) or incorrect (0) - and it is these dichotomous item types that we focus on here. It is also possible to offer polytomous item types (for example based on Likert scales, or partial credit items), but we won’t cover those in this article.</p>
 <p>The responses to the test items can then be used to estimate the candidate’s latent ability. This can be done by first fitting an IRT model to a response dataset collected during the trial phase. This model can then be used to make predictions about latent ability based on item responses once the test goes live. The latent ability estimates can then be converted into a scale score, an ability summary, or both. The rest of this document provides practical examples of designing a multistage test, fitting an IRT model and calculating scores.</p>
 <p>MSTs differ from linear and CATs in that the test items are grouped into modules that can be delivered as separate but linked units as part of a test administration. Progression from module to module is dictated by the candidate’s estimated ability, with cut-scores determining the next module to progress to.</p>
-<div id="the-rasch-model" class="section level3">
-<h3>The Rasch Model</h3>
+<div id="the-rasch-model" class="section level4">
+<h4>The Rasch Model</h4>
 <p>The simplest IRT model, the so-called <em>Rasch model</em>, applies logistic regression to items, using responses from a set of trial candidates. If you’re familiar with linear regression, then the idea behind logistic regression is that the model fits a probability range (between 0.0 and 1.0) rather than a dependent variable. The independent variables are the difficulty of the item (usually designated as <span class="math inline">\(b\)</span>), and the latent ability (which is denoted <span class="math inline">\(\theta\)</span>). Because it only factors in the difficulty parameter of the item, it is also known as the one-parameter logistic model (1PL). Here’s the <em>item response function</em> (IRF) that is used to model the probability of a correct response for candidate <span class="math inline">\(i\)</span> taking test item <span class="math inline">\(j\)</span>:</p>
 <p><span class="math display">\[
 Pr(X_{ij} = 1|\theta_{i},b_{j}) = \frac{exp(\theta_{i} - b_{j})}{1+exp(\theta_{i} - b_{j})}
@@ -82,8 +76,8 @@ Pr(X_{ij} = 1|\theta_{i},b_{j}) = \frac{exp(\theta_{i} - b_{j})}{1+exp(\theta_{i
 <li>The response probability increases with the ability level using the item response function described above</li>
 </ul>
 </div>
-<div id="item-difficulty-and-the-item-characteristic-curve" class="section level3">
-<h3>Item Difficulty and the Item Characteristic Curve</h3>
+<div id="item-difficulty-and-the-item-characteristic-curve" class="section level4">
+<h4>Item Difficulty and the Item Characteristic Curve</h4>
 <p>For every item, the probability that the item will be answered correctly can be visualised by plotting an Item Characteristic Curve (ICC), which uses the above logistic function. Figure 1 plots the ICCs for three items: Item579 (red), Item583 (green) and Item587 (blue).</p>
 <div class="figure">
 <img src="images/icc.png" alt="" />
@@ -92,8 +86,8 @@ Pr(X_{ij} = 1|\theta_{i},b_{j}) = \frac{exp(\theta_{i} - b_{j})}{1+exp(\theta_{i
 <p>There is an equivalence between <span class="math inline">\(\theta\)</span> and <span class="math inline">\(b\)</span>. In this example a candidate with mean ability (<span class="math inline">\(\theta = 0\)</span>) would be expected to get item 587 (blue) correct with a probability of 0.28. The same candidate would have a a probability of 0.83 of getting the less difficult item 583 (green) correct. The further to the right the sigmoid is the more difficult the item is, with item 868 (red) being the most difficult of the three.</p>
 <p>The slope of the curve indicates how discriminating the item is. An item that is very discriminating will have a steep curve; one that is less discriminating will have a flatter curve. Highly discriminating items have more measurement information. Ideally you want to have many discriminating items to be able to provide a lower error in your ability estimate. In general, the more items you are able to trial with, the more information (and less error) you will have.</p>
 </div>
-<div id="item-discrimination-and-the-item-information-function" class="section level3">
-<h3>Item Discrimination and the Item Information Function</h3>
+<div id="item-discrimination-and-the-item-information-function" class="section level4">
+<h4>Item Discrimination and the Item Information Function</h4>
 <p>An item that all candidates always get right because it is too easy has very little informational value for test purposes. The same is true of test items that all candidates always get wrong because they are too hard. It’s telling you very little about the ability levels of your candidates. From this it follows that an item where half the candidates answer correct and the other half answer wrong has the most informational value; this is the point where <span class="math inline">\(\theta\)</span> and <span class="math inline">\(b\)</span> are equal, so the item is perfectly targeted at the ability of these candidates. This relationship can be expressed by the Item Information Function (IIF). In the 1PL model the maximum value of the IIF is 0.25 (it can be different in the other models due to the influence of the discrimination parameter <span class="math inline">\(a\)</span>). Figure 2 displays the IIFs for the same three items as before.</p>
 <div class="figure">
 <img src="images/iif.png" alt="" />
@@ -106,27 +100,27 @@ I_i(\theta, b_i) = P_i(\theta, b_i)Q_i(\theta, b_i)
 <p>Where P is the probability of getting the item correct (for a given ability), and Q is the probability of getting it wrong.</p>
 <p>As mentioned, greater information implies a smaller error of measurement. When designing a test it is important to deliver items with a range of difficulties that match the expected ability ranges of the candidates so that you can accurately measure the your target candidates. In the above diagram you can see that Item 587 (blue) is good at measuring candidates around ability level 0.95. Item 583 (green) is better at measuring candidates with a lower ability level.</p>
 </div>
-<div id="logits" class="section level3">
-<h3>Logits</h3>
+<div id="logits" class="section level4">
+<h4>Logits</h4>
 <p>The log odds, or <em>logit</em> of a correct response can be expressed (in the Rasch model) as <span class="math inline">\(\theta - b\)</span>; so if a candidate has a latent ability level (<span class="math inline">\(\theta\)</span>) which happens to be equal to the difficulty of our item <span class="math inline">\(b_{583}\)</span>, then the odds are even (1:1) that they will answer it correctly (in other words a 50% chance of getting it right, and a 50% chance of getting it wrong). The logit value here would be 0 (this is also the point of maximum information for the item). The logit function is the inverse of the logistic function described earlier:</p>
 <p><span class="math display">\[
 logit(p) = log(\frac{p}{1-p})
 \]</span></p>
 <p>Where <span class="math inline">\(p\)</span> is the probability of getting a correct response.</p>
 </div>
-<div id="test-item-lifecycle" class="section level3">
-<h3>Test Item Lifecycle</h3>
+<div id="test-item-lifecycle" class="section level4">
+<h4>Test Item Lifecycle</h4>
 <p>The item response function is a logistic function with a characteristic sigmoid (or ‘S’ shape), and can be plotted for each item. Throughout the rest of this article we’ll consider an example item, <strong>Item583</strong>, which will follow a <em>lifecycle</em> from when it is first conceived, developed, rated and trialled, banked in the item bank, then delivered as part of one or more test administrations, and finally retired from use.</p>
 <p>Of course, this item is just one of many that will, over time, be added into an item bank. The item will have a number of properties and metadata that describes it. For example the name of the item writer who created it, the skill it is targeting, the sub-skills required, a set of media (audio, video or image files) that is associated with it and which serve as stimuli, the instructions, the prompt question, and importantly for our purposes, the difficulty coefficient <span class="math inline">\(b\)</span>. The rest of this article follows this life cycle, in particular how it relates to the various IRT methodologies for design and validation of multistage tests.</p>
 </div>
 </div>
-<div id="blueprint-and-test-specification" class="section level2">
-<h2>Blueprint and test specification</h2>
+<div id="blueprint-and-test-specification" class="section level3">
+<h3>Blueprint and test specification</h3>
 <p>When designing any test, it is important to ensure that items are written to the target ability range that you want to measure. Subject Matter Experts (SMEs) will need to be involved in the initial test design to make decisions about the length of the test and the components (skills as R,L,S,W, or any combination of these) for the target candidature.</p>
 <p>In a multistage test, modules need to be constructed in such a way that they target a specified ability range. We’ll see later on how a Module Information Function can be used to help with module routing decisions. Also, routing needs to be designed with overlapping items between adjacent modules.</p>
 </div>
-<div id="irt-for-multistage-test-design" class="section level2">
-<h2>IRT for Multistage Test Design</h2>
+<div id="irt-for-multistage-test-design" class="section level3">
+<h3>IRT for Multistage Test Design</h3>
 <p>IRT is used to inform calibration of the test items after they’ve been developed by item writers, as well as construction of the modules and routing between them. Scoring of the test can be derived from the ability estimates. Typically the initial module (known as the routing module) will have an overall difficulty of 0 (ie. a mix of easy and hard items), with subsequent routing directing candidates to easier or more difficult modules in order to ‘hone in’ on an accurate <span class="math inline">\(\hat{\theta}\)</span> (ability estimate) at the end of the test.</p>
 <p>A typical modular design for a MST will look like the one in Figure 3 which is an example of a 1-2-4 design. Other designs are possible.</p>
 <div class="figure">
@@ -135,14 +129,14 @@ logit(p) = log(\frac{p}{1-p})
 </div>
 <p>Important questions to answer during test design include what module topology to use (the number of stages, and the number of modules per stage), and what overall difficulty level should be used for each module (represented by the mean item difficulty, <span class="math inline">\(\bar{b}\)</span>).</p>
 </div>
-<div id="mst-design-considerations" class="section level2">
-<h2>MST Design Considerations</h2>
+<div id="mst-design-considerations" class="section level3">
+<h3>MST Design Considerations</h3>
 <p>As mentioned earlier, multistage test designs comprise a number of modules arranged into stages. The question then becomes, how many stages do we need, and how many modules in each stage do we want? We saw earlier an example of a simple 1-2-4 design.</p>
 <p>This design may not be sufficient for your needs. You need to consider whether there are groups of items that naturally fit into a particular stage (for example, separating reading or listening tasks into separate stages). You also need to consider how many items per stage you want to have. Also, in order for the routing between modules to produce acceptable results, you need to consider the relative difficulty of each module.</p>
 <p>Normally the so-called routing module in stage 1 (Module A) would contain a mix of items with a mean difficulty of 0 (in other words ‘medium’ difficulty). Candidates that are placed in the lower ability range at the end of this module will be routed to the ‘easy’ module in stage 2 (Module B), and those in the upper ability range to the ‘hard’ module (Module C).</p>
 </div>
-<div id="panels" class="section level2">
-<h2>Panels</h2>
+<div id="panels" class="section level3">
+<h3>Panels</h3>
 <p>A benefit of using modules is that items can be placed into modules and then delivered as parallel test forms called <em>panels</em>. Having multiple panels helps to reduce item exposure rate as previously seen panels can be precluded from selection for future test administrations. It also makes it easier to assemble tests. It is possible to place items in more than one panel, but its important to ensure that parallel panels are of equivalent difficulty, see Figure 4.</p>
 <div class="figure">
 <img src="images/panels.png" alt="" />
@@ -151,8 +145,8 @@ logit(p) = log(\frac{p}{1-p})
 <p>When constructed in this way each module can be considered as a module instance (for example Module D:3 being the instance of module D in panel 3), Once the test topology has been decided, the first panel can be developed as a prototype.</p>
 </div>
 </div>
-<div id="references" class="section level1 unnumbered">
-<h1>References</h1>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
 <div id="refs" class="references">
 <div id="ref-lane2015handbook">
 <p>Lane, Suzanne, Mark R Raymond, and Thomas M Haladyna. 2015. <em>Handbook of Test Development</em>. Routledge.</p>

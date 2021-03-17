@@ -1,21 +1,23 @@
 ---
-title: The Practical Application of Computerised Multistage Tests
-author: James Page
+title: "The Practical Application of Computerised Multistage Tests"
+author: "James Page"
 date: '2021-03-08'
 slug: mst-primer-1
-tags: [ 'irt', 'mst' 'rasch' ]
-subtitle: 'A practical guide to the design and development of computerised multistage tests'
+tags:
+- irt
+- mst
+- rasch
+subtitle: A practical guide to the design and development of computerised multistage
+  tests
 summary: ''
-authors: [ 'James Page' ]
 lastmod: '2021-03-08T20:49:06Z'
-math: true
+math: yes
 featured: yes
 projects: []
-link-citations: true
-bibliography: [ references.bib ]
+authors: [ 'james-page' ]
+link-citations: yes
+bibliography: references.bib
 ---
-
-## Overview
 
 Computerised multistage tests (MSTs) have grown in popularity in recent years due to their advantages of flexibility and simplicity over linear and computerised adaptive tests (CATs). A growing body of academic literature is available for researchers, however the practicalities of using MST for the design and delivery of real-world tests is still difficult to access.
 
@@ -26,7 +28,7 @@ In later posts I'll cover the following:
 - The development of MSTs
 - The validation of MSTs
   - Test construction
-  - Trialling
+  - Trialing
   - Scoring and routing
 
 As we explore these topics we’ll consider an example *item* which will follow a lifecycle from when it is first conceived, developed, rated and trialled, banked in the item bank, delivered as part of one or more test administrations, and finally retired from use. We will also consider a hypothetical *candidate* and follow their *journey* from being entered to take the test, being routed between the different stages of the test, and receiving a final score and report on their results.
