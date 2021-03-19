@@ -10,10 +10,13 @@ tags:
 - mst
 - mstR
 subtitle: A practical guide to developing a computerised multistage test (MST)
-summary: ''
+description: "Explains how to use simulation to improve the design of a computerised multistage test (MST)"
 lastmod: '2021-03-15T08:14:25Z'
 featured: yes
 math: yes
+output:
+  blogdown::html_page:
+    toc: true
 image:
   caption: ''
   focal_point: ''
@@ -78,7 +81,7 @@ Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/mst-prim
 
 Average difficulty levels for each module are shown in Figure \@ref(fig:module-items), where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed.
 
-```{r module-items, echo=FALSE, fig.cap="MST Design with average difficulty levels"}
+```{r module-difficulty, echo=FALSE, fig.cap="MST Design with average difficulty levels"}
 knitr::include_graphics("images/module-items.png")
 ```
 
@@ -156,7 +159,7 @@ dfSampleResponse <- genPattern(theta, it.MST)
 
 Here we use a $\theta$ of `r theta` for our hypothetical candidate as an example. Note that this doesn't really simulate a true MST test, as it ignores the routing rules and simply returns a response for all items in the simulated item bank. We can however use the `randomMST()` function in the `mstR` package to perform a more realistic simulation. The `randomMST()` function will generate a response pattern for a given simulated item bank, an MST structure, and a true ability level ($\theta$). We'll use Bayesian model estimation (`"BM"`) for ability estimation (this is the default ability estimation method for the `mstR` library). The maximum Fisher information criterion (`"MFI"`) is used for module selection; again this is the default. The Fisher information is the measure of the amount of information that item $X$ carries about the unknown ability parameter $\theta$.
 
-```{r simulated-MST-test-response, echo=TRUE}
+```{r simulated-MST-test-response, echo=TRUE, cache=TRUE}
 start <- list(theta = theta)
 test <- list(method = "BM", moduleSelect = "MFI")
 final <- list(method = "BM")
@@ -253,7 +256,7 @@ simulation.final <- list(method = "BM")
 
 We'll then loop over each design, running the `randomMST()` function to simulate a test.
 
-```{r simulate-tests}
+```{r simulate-tests, cache=TRUE}
 for (j in 1:6) {
   for (i in 1:length(simulation.candidates)) {
     prov <- randomMST(trueTheta = simulation.candidates[i],
@@ -272,7 +275,7 @@ The results can now be graphed. Following @ippel2020efficient, and @magis2017com
 In the following code snippet we define the `ASB()` and `RMSE()` functions, and then apply them repeatedly over the simulation results to build up data frames for the ASB and RMSE statistic so that we can run a comparison plot for each design.
 
 
-```{r ASB-RMSE}
+```{r ASB-RMSE, cache=TRUE}
 simulation.ASB <- simulation.RMSE <- matrix(NA, length(simulation.levels), length(testDesigns))
 ASB <- function(t, th) mean(t-th)
 RMSE <- function(t, th) sqrt(mean((t-th)^2))
