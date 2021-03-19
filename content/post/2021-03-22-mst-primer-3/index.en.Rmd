@@ -11,6 +11,7 @@ tags:
   - mstR
   - rasch
 lastmod: '2021-03-19T21:13:11Z'
+publishDate: '2021-03-22'
 subtitle: A practical guide to developing a computerised multistage test (MST)
 description: "Explains how to fit a Rasch model to a computerised multistage test (MST) to work out item difficulties, cut scores and scale scores."
 featured: yes
@@ -23,6 +24,7 @@ image:
   focal_point: ''
   preview_only: no
 authors: [ 'james-page' ]
+series: [ 'MST Primer' ]
 link-citations: yes
 bibliography: references.bib
 ---
@@ -43,7 +45,16 @@ After making final decisions about test design, test development can start in ea
 
 Once the parameters of the test design are well established, the test designers should have a good idea of the number of modules, items and relative difficulties required. Where possible the simplest design is preferred. In our case for the sake of simplicity we'll go with design 1:
 
-```{r MST Design 1, echo=TRUE}
+```{r MST Design 1, echo=FALSE, message=FALSE}
+designParams <- read_csv('mst-designs.csv', skip = 1) %>%
+  clean_names() %>%
+  dplyr::select(-total)
+
+displayParams <- designParams %>%
+  rename(Design=design, `1`=stage1, `2`=stage2, `3`=stage3,
+         A=module_a, B=module_b, C=module_c,
+         D=module_d, E=module_e, F=module_f, G=module_g)
+
 kbl(head(displayParams, n = 1), caption = 'MST Design 1') %>%
   kable_styling() %>%
   add_header_above(c(" ", "Stage" = 3, "Module" = 7))
@@ -55,7 +66,9 @@ A process of item writing will then be undertaken. Subject matter experts (SMEs)
 
 In general, the test designers will want to ensure that each module contains a balance of items of varying difficulty within the target ability range for each module. The Common European Frame of Reference (CEFR) is used to assign items into different ability levels (A1-C2). In our example, the 12 items in Module A cover all levels of the CEFR, as in Figure 9.
 
-![Module A Items](images/moduleA-items.png)
+```{r Module-A-Items, echo=FALSE, fig.cap="Module A Items"}
+knitr::include_graphics("images/moduleA-items.png")
+```
 
 ### Initial Validation of Item Quality
 
@@ -95,6 +108,12 @@ Here, $p$ is the number of items and $\bar{r}$ is the average of all covariances
 Since in our test we've split our items into different modules according to the skill that is being measured, so it makes sense to calculate alphas for each module, although we could also do so by stage if we wanted. We need to make sure that we remove any rows containing NA values before calculating Cronbach's alpha.
 
 ```{r Cronbachs alpha, echo=FALSE}
+# create the `module` function to map module names to indices
+moduleIndices <- seq(1:7)
+moduleNames <- c('A', 'B', 'C', 'D', 'E', 'F', 'G')
+names(moduleIndices) <- moduleNames
+module <- function(n) { unname(moduleIndices[n]) }
+
 # drop the Candidate column, it's not required for the IRT functions
 dfTrial <- dplyr::select(dfTestResponses, -Candidate)
 
@@ -153,6 +172,8 @@ Ideally, we're looking for alphas of 0.7 and above; less than this indicates tha
 We're now ready to fit the Rasch model, using the `rasch` function in the `ltm` package:
 
 ```{r Rasch model}
+library(ltm)
+
 # fit the Rasch model
 raschmodel <- ltm::rasch(dfTrial, constraint = cbind(length(dfTrial) + 1, 1),
                      IRT.param = TRUE, start.val = "random")

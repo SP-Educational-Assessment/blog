@@ -23,6 +23,7 @@ image:
   preview_only: no
 projects: []
 authors: [ 'james-page' ]
+series: [ 'MST Primer' ]
 link-citations: yes
 bibliography: references.bib
 ---
