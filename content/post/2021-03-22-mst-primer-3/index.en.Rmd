@@ -33,19 +33,20 @@ bibliography: references.bib
 library(kableExtra)
 library(tidyverse)
 library(janitor)
+library(ltm)
 
 knitr::opts_chunk$set(
   comment = '', fig.width = 6, fig.height = 6
 )
 ```
 
-After making final decisions about test design, test development can start in earnest. In this part we describe what needs to be done before a MST can be finalized.
+After making final decisions about test design, test development can start in earnest. In this post we describe what needs to be done before a MST can be finalized.
 
 ## Test Construction
 
 Once the parameters of the test design are well established, the test designers should have a good idea of the number of modules, items and relative difficulties required. Where possible the simplest design is preferred. In our case for the sake of simplicity we'll go with design 1:
 
-```{r MST Design 1, echo=FALSE, message=FALSE}
+```{r mst-design-1, echo=FALSE, message=FALSE}
 designParams <- read_csv('mst-designs.csv', skip = 1) %>%
   clean_names() %>%
   dplyr::select(-total)
@@ -64,9 +65,9 @@ kbl(head(displayParams, n = 1), caption = 'MST Design 1') %>%
 
 A process of item writing will then be undertaken. Subject matter experts (SMEs) will be brought in to help define the instructions for test writers. A set of items will then be created by the team of item writers. To take our test design example, we'll establish the number of items for each module that will be required at each CEFR level.
 
-In general, the test designers will want to ensure that each module contains a balance of items of varying difficulty within the target ability range for each module. The Common European Frame of Reference (CEFR) is used to assign items into different ability levels (A1-C2). In our example, the 12 items in Module A cover all levels of the CEFR, as in Figure 9.
+In general, the test designers will want to ensure that each module contains a balance of items of varying difficulty within the target ability range for each module. The Common European Frame of Reference (CEFR) is used to assign items into different ability levels (A1-C2). In our example, the 12 items in Module A cover all levels of the CEFR, as in Figure \@ref(fig:Module-A-Items).
 
-```{r Module-A-Items, echo=FALSE, fig.cap="Module A Items"}
+```{r Module-A-Items, echo=FALSE, fig.height=10, fig.cap="Module A Items"}
 knitr::include_graphics("images/moduleA-items.png")
 ```
 
@@ -91,7 +92,7 @@ kbl(head(dfTestResponses[1:8]), caption = 'Example Test Reponses') %>%
   kable_styling()
 ```
 
-The `ltm` library can be used to fit a number of dichotomous and polytomous IRT models. It's the fastest R library that we've used for fitting a Rasch model. Before doing that we get some summary statistics from the data, including the Cronbach's alpha measure of covariance. 
+The `ltm` library can be used to fit a number of dichotomous and polytomous IRT models. It's the fastest R library that we've used for fitting a Rasch model. Before doing that we get some summary statistics from the data, including the *Cronbach's alpha* measure of covariance. 
 
 #### Consistency and reliability
 
@@ -172,8 +173,6 @@ Ideally, we're looking for alphas of 0.7 and above; less than this indicates tha
 We're now ready to fit the Rasch model, using the `rasch` function in the `ltm` package:
 
 ```{r Rasch model}
-library(ltm)
-
 # fit the Rasch model
 raschmodel <- ltm::rasch(dfTrial, constraint = cbind(length(dfTrial) + 1, 1),
                      IRT.param = TRUE, start.val = "random")
@@ -310,7 +309,7 @@ In this section, we'll show how to use the Module Information Function (MIF) to 
 
 ### Scale Scores for Test Reporting
 
-We could provide candidates with their $\hat{\theta}$ at test end but most candidates and testing organisations do not like theta values and the concept of zero as the population mean and negative ability values are difficult for most people to conceptualise. We therefore need to convert the theta value into a scale score. This usually involves fitting the theta to a range that is chosen by the testing body and acceptable for its stakeholders (for example a score in the range 20-80).
+It would be possible to provide candidates with their $\hat{\theta}$ at the end of the test. However most candidates and testing organisations do not like theta values; the concept of zero as the population mean, or negative ability values are difficult for many people to conceptualise. We decide therefore to convert the theta value into a scale score for reporting purposes. This usually involves fitting the theta to a range that is chosen by the testing body and acceptable for its stakeholders (for example a score in the range 20-80).
 
 Before we get to that point however we'll cover the case where the test administration system is unable to calculate the theta estimate and we need to provide a true score to scale score mapping. We do this by first converting true score to theta estimate, and then mapping the theta estimate on to a scale score. True score is simply the number correct (NC) for a given module.
 
@@ -336,7 +335,7 @@ lm_moduleA_scores_poly <- lm(theta ~ poly(trueScore, degree=5, raw=TRUE), data =
 summary(lm_moduleA_scores_poly)
 ```
 
-The low p-values indicate that this is a useful model for our use. From here we pull out the coefficients (terms) that will be used for the polynomial function.
+The low p-values indicate that this is a useful model for our purpose. From here we pull out the coefficients (terms) that will be used for the polynomial function.
 
 ```{r Module A True Score Function}
 gA_coeffs <- unname(coef(lm_moduleA_scores_poly))
@@ -344,11 +343,12 @@ gA_coeffs <- unname(coef(lm_moduleA_scores_poly))
 (gA_coeffs)
 ```
 
-In order to calculate the ability for a candidate, such a function can be used to map from the number correct (NC) score to an estimated theta for candidate $i$, $\hat\theta_i$. The function $g_A()$ that will be used for module A could be written in R function like this:
+In order to calculate the ability for a candidate, such a function can be used to map from the number correct (NC) score to an estimated theta for candidate $i$: $\hat\theta_i$. The $g_A()$ function that will be used for module A could be written as an R function like this:
 
 ```{r}
 gA <- function(x) {
-  return(gA_coeffs[6]*x^5 + gA_coeffs[5]*x^4 + gA_coeffs[4]*x^3 + gA_coeffs[3]*x^2 + gA_coeffs[2]*x + gA_coeffs[1])
+  return(gA_coeffs[6]*x^5 + gA_coeffs[5]*x^4 + gA_coeffs[4]*x^3 + 
+           gA_coeffs[3]*x^2 + gA_coeffs[2]*x + gA_coeffs[1])
 }
 ```
 
