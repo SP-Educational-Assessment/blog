@@ -2,8 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
-public
-blogdown
+/blogdown/
+/public/
 
 *.tar
 .DS_Store
