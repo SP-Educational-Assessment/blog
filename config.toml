@@ -70,6 +70,7 @@ disableAliases = true  # Disable aliases when `redirects` is added to the `outpu
   tag = "tags"
   category = "categories"
   author = "authors"
+  series = "series"
 
 # Related content.
 [related]

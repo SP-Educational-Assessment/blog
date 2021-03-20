@@ -1,0 +1,35 @@
+<footer class="site-footer">
+  {{ if or (site.GetPage "terms.md") (site.GetPage "privacy.md") }}
+  <p class="powered-by">
+    {{ with site.GetPage "privacy.md" }}
+      {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
+    {{ end }}
+    {{ with site.GetPage "terms.md" }}
+      {{ if site.GetPage "privacy.md" }} &middot; {{ end }}
+      {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
+    {{ end }}
+  </p>
+  {{ end }}
+
+  <p class="powered-by">
+    {{ with site.Copyright }}{{ replace . "{year}" now.Year | markdownify}}{{ end }}
+  </p>
+
+  {{/* Display copyright license. */}}
+  {{ partial "site_footer_license" . }}
+
+  <p class="powered-by">
+    {{ $is_sponsor := site.Params.i_am_a_sponsor | default false }}
+    {{ $hide_published_with_footer := site.Params.power_ups.hide_published_with | default true }}
+    {{ if not (and $is_sponsor $hide_published_with_footer) }}
+    Made with
+        <a href="https://github.com/SP-Educational-Assessment/blog" target="_blank" rel="noopener">
+              <i class="fas fa-code-branch" style="color: #EFAE44"></i>
+        </a> +
+        <a href="https://github.com/rstudio/blogdown" target="_blank" rel="noopener" style="color: #EFAE44">blogdown</a> +
+        <a href="https://github.com/wowchemy/wowchemy-hugo-modules" target="_blank" rel="noopener" style="color: #EFAE44">Wowchemy</a> +
+        <a href="https://gohugo.io" target="_blank" rel="noopener" style="color: #EFAE44">Hugo</a> +
+        <i class="far fa-heart" style="color: #EFAE44"></i>
+    {{ end }}
+  </p>
+</footer>

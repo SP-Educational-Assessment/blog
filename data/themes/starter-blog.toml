@@ -5,12 +5,12 @@ name = "Starter Blog"
 light = true
 
 # Primary
-primary = "#F3DD6B"
+primary = "#EFAE44"
 
 # Menu
 menu_primary = "#fff"
-menu_text = "#34495e"
-menu_text_active = "#EFAE44"
+menu_text_active = "#34495e"
+menu_text = "#EFAE44"
 menu_title = "#231825"
 
 # Home sections
