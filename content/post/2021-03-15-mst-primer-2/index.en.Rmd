@@ -82,7 +82,7 @@ Assuming the 1-2-4 pattern described in the [previous post](/2021/03/08/mst-prim
 
 Average difficulty levels for each module are shown in Figure \@ref(fig:module-difficulty), where $\bar{b}$ is the mean difficulty of the module, and a standard deviation of 1 is assumed.
 
-```{r module-difficulty, echo=FALSE, fig.cap="MST Design with average difficulty levels"}
+```{r module-difficulty, echo=FALSE, out.width="200%", out.height="200%", fig.cap="MST Design with average difficulty levels"}
 knitr::include_graphics("images/module-items.png")
 ```
 

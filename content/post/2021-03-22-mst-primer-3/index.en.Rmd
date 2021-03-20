@@ -67,7 +67,7 @@ A process of item writing will then be undertaken. Subject matter experts (SMEs)
 
 In general, the test designers will want to ensure that each module contains a balance of items of varying difficulty within the target ability range for each module. The Common European Frame of Reference (CEFR) is used to assign items into different ability levels (A1-C2). In our example, the 12 items in Module A cover all levels of the CEFR, as in Figure \@ref(fig:Module-A-Items).
 
-```{r Module-A-Items, echo=FALSE, fig.height=10, fig.cap="Module A Items"}
+```{r Module-A-Items, echo=FALSE, out.width="200%", out.height="200%", fig.cap="Module A Items"}
 knitr::include_graphics("images/moduleA-items.png")
 ```
 
