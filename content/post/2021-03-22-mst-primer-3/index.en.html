@@ -577,7 +577,7 @@ ggplot(itemPlot, aes(x=theta, y=probability)) +
   geom_line() +
   labs(title=&quot;Item Characteristic Curve&quot;, x=&quot;theta&quot;, y=&quot;P(X=1)&quot;)</code></pre>
 <p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
-<p>In this example Figure 12 we see the item characteristic curve (ICC) for Item106 with difficulty <span class="math inline">\(b\)</span> = 2.1164707.</p>
+<p>In this example Figure 12 we see the item characteristic curve (ICC) for Item106 with difficulty <span class="math inline">\(b\)</span> = 2.1169821.</p>
 </div>
 <div id="module-characteristic-curves-mccs" class="section level3">
 <h3>Module Characteristic Curves (MCCs)</h3>
@@ -651,7 +651,7 @@ ggplot(plotData, aes(x=theta, y=trueScore)) +
 <h4>Converting True Score to Theta</h4>
 <p>Recall that the MCCs provide a mapping from the number of correct scores for each module to an ability estimate: <span class="math inline">\(\hat{\theta}\)</span>. A quintic polynomial can be used to fit the MCC, and the resulting coefficients of this polynomial function can then used by the test administration system to provide an ability estimate at the end of each module. The scale scores can then be used to provide an aggregated test score once the final stage of the MST has completed.</p>
 <p>Effectively we use a polynomial regression to map the non-linear relationship between the number correct that a candidate scores and the ability estimate based on the items in that module. This is possible because of the direct summative relationship between ICCs and MCCs to derive ability estimates. You may ask why do we need to go to the trouble of fitting a seperate regression to what is a effectively a sum of logistic regressions? The difficulty here arises for test administration systems where the item difficulties are unknown (because access to these values from the item bank is unavailable), or the system is not capable of using the IRT functions to compute the ICCs and MCCs from the item parameters. The number of possible values is limited anyway (the number correct value for a module will be <span class="math inline">\(n + 1\)</span>, where <span class="math inline">\(n\)</span> is the number of items in the module), so another approach is to simply store the NC to ability estimate equivalences in a table for lookup during test administration.</p>
-<p>An further approach that is interesting is the use of the D-Scoring method (see <span class="citation">Han, Dimitrov, and Al-Mashary (<a href="#ref-han2019developing" role="doc-biblioref">2019</a>)</span>). We have not had time to undertake a full investigation of the D-Scoring method, but it is certainly something we intend to look at in a future article.</p>
+<p>A different approach that is worth considering is the use of the D-Scores (see <span class="citation">Han, Dimitrov, and Al-Mashary (<a href="#ref-han2019developing" role="doc-biblioref">2019</a>)</span>). We have not had time to undertake a full investigation of the D-Scoring method, but it is certainly something we intend to look at in a future article.</p>
 </div>
 <div id="module-a-mapping-function" class="section level4">
 <h4>Module A Mapping Function</h4>
@@ -663,14 +663,14 @@ lm(formula = theta ~ poly(trueScore, degree = 5, raw = TRUE),
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--0.062022 -0.011526  0.000278  0.011340  0.029831 
+-0.062022 -0.011527  0.000279  0.011341  0.029831 
 
 Coefficients:
                                            Estimate Std. Error t value Pr(&gt;|t|)
-(Intercept)                              -4.671e+00  1.586e-02 -294.51   &lt;2e-16
+(Intercept)                              -4.671e+00  1.586e-02 -294.49   &lt;2e-16
 poly(trueScore, degree = 5, raw = TRUE)1  2.028e+00  2.542e-02   79.75   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)2 -5.398e-01  1.268e-02  -42.57   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)3  9.321e-02  2.661e-03   35.02   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)2 -5.398e-01  1.268e-02  -42.56   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)3  9.322e-02  2.662e-03   35.02   &lt;2e-16
 poly(trueScore, degree = 5, raw = TRUE)4 -7.812e-03  2.467e-04  -31.66   &lt;2e-16
 poly(trueScore, degree = 5, raw = TRUE)5  2.571e-04  8.336e-06   30.84   &lt;2e-16
                                             
@@ -685,19 +685,19 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 
 Residual standard error: 0.01587 on 94 degrees of freedom
 Multiple R-squared:      1, Adjusted R-squared:  0.9999 
-F-statistic: 3.898e+05 on 5 and 94 DF,  p-value: &lt; 2.2e-16</code></pre>
+F-statistic: 3.897e+05 on 5 and 94 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The low p-values indicate that this is a useful model for our purpose. From here we pull out the coefficients (terms) that will be used for the polynomial function.</p>
 <pre class="r"><code>gA_coeffs &lt;- unname(coef(lm_moduleA_scores_poly))
 
 (gA_coeffs)</code></pre>
-<pre><code>[1] -4.6706119318  2.0275333684 -0.5398090304  0.0932142556 -0.0078119340
-[6]  0.0002570509</code></pre>
+<pre><code>[1] -4.6706124372  2.0275664400 -0.5398241908  0.0932175051 -0.0078122617
+[6]  0.0002570617</code></pre>
 <p>In order to calculate the ability for a candidate, such a function can be used to map from the number correct (NC) score to an estimated theta for candidate <span class="math inline">\(i\)</span>: <span class="math inline">\(\hat\theta_i\)</span>. The <span class="math inline">\(g_A()\)</span> function that will be used for module A could be written as an R function like this:</p>
 <pre class="r"><code>gA &lt;- function(x) {
   return(gA_coeffs[6]*x^5 + gA_coeffs[5]*x^4 + gA_coeffs[4]*x^3 + 
            gA_coeffs[3]*x^2 + gA_coeffs[2]*x + gA_coeffs[1])
 }</code></pre>
-<p>The parameter <code>x</code> is the NC score. So, a candidate who scores 9 out of 12 on module A would have a <span class="math inline">\(\hat\theta\)</span> = 1.7303496.</p>
+<p>The parameter <code>x</code> is the NC score. So, a candidate who scores 9 out of 12 on module A would have a <span class="math inline">\(\hat\theta\)</span> = 1.7302721.</p>
 </div>
 <div id="validating-the-mapping-function" class="section level4">
 <h4>Validating the Mapping Function</h4>

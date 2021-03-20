@@ -319,7 +319,7 @@ Recall that the MCCs provide a mapping from the number of correct scores for eac
 
 Effectively we use a polynomial regression to map the non-linear relationship between the number correct that a candidate scores and the ability estimate based on the items in that module. This is possible because of the direct summative relationship between ICCs and MCCs to derive ability estimates. You may ask why do we need to go to the trouble of fitting a seperate regression to what is a effectively a sum of logistic regressions? The difficulty here arises for test administration systems where the item difficulties are unknown (because access to these values from the item bank is unavailable), or the system is not capable of using the IRT functions to compute the ICCs and MCCs from the item parameters. The number of possible values is limited anyway (the number correct value for a module will be $n + 1$, where $n$ is the number of items in the module), so another approach is to simply store the NC to ability estimate equivalences in a table for lookup during test administration.
 
-An further approach that is interesting is the use of the D-Scoring method (see @han2019developing). We have not had time to undertake a full investigation of the D-Scoring method, but it is certainly something we intend to look at in a future article.
+A different approach that is worth considering is the use of the D-Scores (see @han2019developing). We have not had time to undertake a full investigation of the D-Scoring method, but it is certainly something we intend to look at in a future article.
 
 #### Module A Mapping Function
 
