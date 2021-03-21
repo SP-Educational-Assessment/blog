@@ -1,0 +1,15 @@
+{{ $provider := trim (site.Params.comments.provider | lower) " " }}
+
+{{ if $provider }}
+  {{ $provider_tpl := printf "partials/comments/%s" $provider }}
+
+  {{ $commentable_page_types := site.Params.comments.commentable | default dict }}
+  {{ $commentable_page_type := index $commentable_page_types .Type | default false }}
+  {{ $commentable_page := (ne .Params.commentable false) | and $commentable_page_type }}
+
+  {{ if $commentable_page }}
+  <section id="comments">
+    {{ partial $provider_tpl . }}
+  </section>
+  {{ end }}
+{{ end }}
