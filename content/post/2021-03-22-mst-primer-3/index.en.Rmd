@@ -170,7 +170,7 @@ ggplot(dfCronbachsAlpha,
     geom_vline(xintercept = 0.7, linetype="dotted")
 ```
 
-Ideally, we're looking for alphas of 0.7 and, the dashed vertical line in Figure \@ref(fig:cronbach-plot) indicates this threshold; much less than this indicates that there is weak covariance between the items in the module, which means they may not be testing the same trait. This measure is really only useful as a guide for further investigations; the ultimate decision on whether to modify the items in each module should be taken in collaboration with the subject matter experts. We can see that several of these values are really quite low; it should be borne in mind however that this is a simulated data set that was generated for the purposes of testing the data pipeline. 
+Ideally, we're looking for alphas of 0.7 and above, the dashed vertical line in Figure \@ref(fig:cronbach-plot) indicates this threshold; much less than this indicates that there is weak covariance between the items in the module, which means they may not be testing the same trait. This measure is really only useful as a guide for further investigations; the ultimate decision on whether to modify the items in each module should be taken in collaboration with the subject matter experts. We can see that several of these values are really quite low; it should be borne in mind however that this is a simulated data set that was generated for the purposes of testing the data pipeline. 
 
 ### Rasch Model
 

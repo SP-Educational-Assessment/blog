@@ -28,7 +28,6 @@ link-citations: yes
 bibliography: references.bib
 ---
 
-<script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
 <script src="{{< blogdown/postref >}}index.en_files/kePrint/kePrint.js"></script>
 <link href="{{< blogdown/postref >}}index.en_files/lightable/lightable.css" rel="stylesheet" />
 
@@ -36,8 +35,7 @@ bibliography: references.bib
 <ul>
 <li><a href="#simulation">Simulation</a></li>
 <li><a href="#data-sources-and-management">Data Sources and Management</a></li>
-<li><a href="#pre-trial-simulation-and-design">Pre-Trial Simulation and Design</a>
-<ul>
+<li><a href="#pre-trial-simulation-and-design">Pre-Trial Simulation and Design</a><ul>
 <li><a href="#module-setup">Module Setup</a></li>
 <li><a href="#test-simulation">Test Simulation</a></li>
 <li><a href="#running-repeated-simulations">Running Repeated Simulations</a></li>
@@ -65,7 +63,7 @@ bibliography: references.bib
 </div>
 <div id="pre-trial-simulation-and-design" class="section level2">
 <h2>Pre-Trial Simulation and Design</h2>
-<p>An initial simulation of the test can be used to experiment with different designs. We show how to do this using the <code>mstR</code> library (see <span class="citation"><a href="#ref-magis2017computerized" role="doc-biblioref">Magis, Yan, and Von Davier</a> (<a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span>). Here the aim is to select a set of designs and see if there is an optimal one It will also help understand how the scoring of the test should be implemented, including the number correct (NC) scores that will be used for routing, and the ability estimates for final scoring and reporting.</p>
+<p>An initial simulation of the test can be used to experiment with different designs. We show how to do this using the <code>mstR</code> library (see <span class="citation">Magis, Yan, and Von Davier (<a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span>). Here the aim is to select a set of designs and see if there is an optimal one It will also help understand how the scoring of the test should be implemented, including the number correct (NC) scores that will be used for routing, and the ability estimates for final scoring and reporting.</p>
 <p>The <code>mstR</code> library can take an existing set of item responses, or you can use it to generate a set of randomised simulated item responses. This latter ability is useful in the pre-trial stage where we’re interested in finding out how routing between modules should be established, or to validate assumptions in the test design.</p>
 <p>The aim here is to sift through several different test designs with a view of converging on the optimal design for the . The ability to re-run simulations easily with different design parameters provides a powerful means of trying out different design ideas before incurring the costs of engaging item writers, raters and trial candidates.</p>
 <div id="module-setup" class="section level3">
@@ -565,7 +563,7 @@ simulation.final &lt;- list(method = &quot;BM&quot;)</code></pre>
 }</code></pre>
 <div id="asb-and-rmse-values" class="section level4">
 <h4>ASB and RMSE values</h4>
-<p>The results can now be graphed. Following <span class="citation"><a href="#ref-ippel2020efficient" role="doc-biblioref">Ippel and Magis</a> (<a href="#ref-ippel2020efficient" role="doc-biblioref">2020</a>)</span>, and <span class="citation"><a href="#ref-magis2017computerized" role="doc-biblioref">Magis, Yan, and Von Davier</a> (<a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span> we compute the averaged signed bias (ASB) and root mean squared error (RMSE) values for each design and for each ability level. ASB is the mean difference between estimated and true ability levels. RMSE is the square root of the mean of the squared differences between estimated and true ability levels. With both measures, lower is better.</p>
+<p>The results can now be graphed. Following <span class="citation">Ippel and Magis (<a href="#ref-ippel2020efficient" role="doc-biblioref">2020</a>)</span>, and <span class="citation">Magis, Yan, and Von Davier (<a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span> we compute the averaged signed bias (ASB) and root mean squared error (RMSE) values for each design and for each ability level. ASB is the mean difference between estimated and true ability levels. RMSE is the square root of the mean of the squared differences between estimated and true ability levels. With both measures, lower is better.</p>
 <p>In the following code snippet we define the <code>ASB()</code> and <code>RMSE()</code> functions, and then apply them repeatedly over the simulation results to build up data frames for the ASB and RMSE statistic so that we can run a comparison plot for each design.</p>
 <pre class="r"><code>simulation.ASB &lt;- simulation.RMSE &lt;- matrix(NA, length(simulation.levels), length(testDesigns))
 ASB &lt;- function(t, th) mean(t-th)
@@ -617,18 +615,18 @@ Figure 4: RMSE
 </p>
 </div>
 <p>Both these graphs show that there is very little variation between the different designs - they all show a similar pattern, with overestimation for very low and very high ability levels. If anything, designs 4 and 5 appear to give the least bias and error (especially around the zero theta point). These designs both have 12 items in the final stage module; so this is potentially an avenue worth investigating - increasing the number of items in the final stage may be the best approach. Further simulations can be run to look into this.</p>
-<p>For more details on how to run simulations like this see Chapter 7 of <span class="citation">(<a href="#ref-magis2017computerized" role="doc-biblioref">Magis, Yan, and Von Davier 2017</a>)</span>, or check out the <a href="https://cran.r-project.org/web/packages/mstR/index.html">mstR</a> package.</p>
+<p>For more details on how to run simulations like this see Chapter 7 of <span class="citation">(Magis, Yan, and Von Davier <a href="#ref-magis2017computerized" role="doc-biblioref">2017</a>)</span>, or check out the <a href="https://cran.r-project.org/web/packages/mstR/index.html">mstR</a> package.</p>
 </div>
 </div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2>References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-ippel2020efficient" class="csl-entry">
-Ippel, Lianne, and David Magis. 2020. <span>“Efficient Standard Errors in Item Response Theory Models for Short Tests.”</span> <em>Educational and Psychological Measurement</em> 80 (3): 461–75.
+<div id="refs" class="references">
+<div id="ref-ippel2020efficient">
+<p>Ippel, Lianne, and David Magis. 2020. “Efficient Standard Errors in Item Response Theory Models for Short Tests.” <em>Educational and Psychological Measurement</em> 80 (3): 461–75.</p>
 </div>
-<div id="ref-magis2017computerized" class="csl-entry">
-Magis, David, Duanli Yan, and Alina A Von Davier. 2017. <em>Computerized Adaptive and Multistage Testing with r: Using Packages Catr and Mstr</em>. Springer.
+<div id="ref-magis2017computerized">
+<p>Magis, David, Duanli Yan, and Alina A Von Davier. 2017. <em>Computerized Adaptive and Multistage Testing with R: Using Packages Catr and Mstr</em>. Springer.</p>
 </div>
 </div>
 </div>
