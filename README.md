@@ -92,15 +92,15 @@ Note that HTTPS is not configured for use in the Docker container.
 
 ## Publish to Live
 
-The easiest way to publish to the Mythic Beasts hosting service is to zip the `public` directory then copy it to the `onza` host:
+The easiest way to publish to the live hosting service is to zip the `public` directory then copy it to the web host:
 
 ```bash
 cp .htaccess public/.htaccess
 zip -r speduas-blog-image public -x "*.DS_Store"
-scp speduas-blog-image.zip jamesp27@onza.mythic-beasts.com:www
+scp speduas-blog-image.zip foobar@webhost.example.com:www
 ```
 
-Then log on to the `onza` host and extract to a new folder called `public` in `www`:
+Then log on to the host and extract to a new folder called `public` in `www`:
 
 ```bash
 unzip speduas-blog-image.zip
