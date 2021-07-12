@@ -6,5 +6,6 @@
 /public/
 
 *.tar
+*.zip
 .DS_Store
 Thumbs.db

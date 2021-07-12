@@ -597,7 +597,7 @@ colnames(itemPlot) &lt;- c(&#39;theta&#39;, &#39;probability&#39;)</code></pre>
 Figure 4: Item Characteristic Curve
 </p>
 </div>
-<p>In Figure <a href="#fig:icc-plot">4</a> we see the item characteristic curve (ICC) for Item106 with difficulty <span class="math inline">\(b\)</span> = 2.1165428. Note that for consistency with other figures in this post I’m using <code>ggplot</code> to visualise the ICC; by passing the <code>plot = FALSE</code> parameter to the <code>ltm::plot()</code> function we can return a data frame that can then be used by <code>ggplot</code>.</p>
+<p>In Figure <a href="#fig:icc-plot">4</a> we see the item characteristic curve (ICC) for Item106 with difficulty <span class="math inline">\(b\)</span> = 2.1170186. Note that for consistency with other figures in this post I’m using <code>ggplot</code> to visualise the ICC; by passing the <code>plot = FALSE</code> parameter to the <code>ltm::plot()</code> function we can return a data frame that can then be used by <code>ggplot</code>.</p>
 </div>
 <div id="module-characteristic-curves-mccs" class="section level3">
 <h3>Module Characteristic Curves (MCCs)</h3>
@@ -696,16 +696,16 @@ lm(formula = theta ~ poly(trueScore, degree = 5, raw = TRUE),
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--0.062024 -0.011526  0.000278  0.011340  0.029832 
+-0.062022 -0.011525  0.000278  0.011339  0.029831 
 
 Coefficients:
                                            Estimate Std. Error t value Pr(&gt;|t|)
 (Intercept)                              -4.671e+00  1.586e-02 -294.51   &lt;2e-16
 poly(trueScore, degree = 5, raw = TRUE)1  2.028e+00  2.542e-02   79.75   &lt;2e-16
 poly(trueScore, degree = 5, raw = TRUE)2 -5.398e-01  1.268e-02  -42.56   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)3  9.322e-02  2.662e-03   35.02   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)3  9.321e-02  2.661e-03   35.02   &lt;2e-16
 poly(trueScore, degree = 5, raw = TRUE)4 -7.812e-03  2.467e-04  -31.66   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)5  2.571e-04  8.336e-06   30.84   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)5  2.570e-04  8.336e-06   30.84   &lt;2e-16
                                             
 (Intercept)                              ***
 poly(trueScore, degree = 5, raw = TRUE)1 ***
@@ -723,14 +723,14 @@ F-statistic: 3.898e+05 on 5 and 94 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>gA_coeffs &lt;- unname(coef(lm_moduleA_scores_poly))
 
 (gA_coeffs)</code></pre>
-<pre><code>[1] -4.6706030405  2.0275455773 -0.5398160443  0.0932157642 -0.0078120773
-[6]  0.0002570556</code></pre>
+<pre><code>[1] -4.6706118027  2.0275131634 -0.5398010528  0.0932121247 -0.0078116964
+[6]  0.0002570422</code></pre>
 <p>In order to calculate the ability for a candidate, such a function can be used to map from the number correct (NC) score to an estimated theta for candidate <span class="math inline">\(i\)</span>: <span class="math inline">\(\hat\theta_i\)</span>. The <span class="math inline">\(g_A()\)</span> function that will be used for module A could be written as an R function like this:</p>
 <pre class="r"><code>gA &lt;- function(x) {
   return(gA_coeffs[6]*x^5 + gA_coeffs[5]*x^4 + gA_coeffs[4]*x^3 + 
            gA_coeffs[3]*x^2 + gA_coeffs[2]*x + gA_coeffs[1])
 }</code></pre>
-<p>The parameter <code>x</code> is the NC score. So, a candidate who scores 9 out of 12 on module A would have a <span class="math inline">\(\hat\theta\)</span> = 1.7303358.</p>
+<p>The parameter <code>x</code> is the NC score. So, a candidate who scores 9 out of 12 on module A would have a <span class="math inline">\(\hat\theta\)</span> = 1.7303075.</p>
 </div>
 <div id="validating-the-mapping-function" class="section level4">
 <h4>Validating the Mapping Function</h4>
