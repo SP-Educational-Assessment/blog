@@ -5,10 +5,10 @@ date: '2021-03-15'
 slug: mst-primer-2
 categories: R
 tags:
-- irt
-- rasch
-- mst
-- mstR
+  - irt
+  - rasch
+  - mst
+  - mstR
 subtitle: A practical guide to developing a computerised multistage test (MST)
 description: "Explains how to use simulation to improve the design of a computerised multistage test (MST)."
 lastmod: '2021-03-15T08:14:25Z'
@@ -42,7 +42,7 @@ In this post we'll describe the steps required for the development of a computer
 
 ## Simulation
 
-In the pre-trial stage, it is useful to run simulations to help us answer the questions posed in the previous part of this article. The results of these simulations will help inform final decisions about the test design. It's always less expensive to make modifications to a design early on in the process, before significant investment in item writing and trialling has been made. The ability to simulate a test at the design phase can be used to understand the constraints of the design at an early stage and make changes in a low-cost, low-risk way. In this post we'll show how the [`mstR` R package](https://cran.r-project.org/web/packages/mstR/) can be used to run simulations for a MST design. First though we'll cover the data sources that we'll be using.
+In the pre-trial stage, it is useful to run simulations to help us answer the questions posed in the previous part of this article. The results of these simulations will help inform final decisions about the test design. It's always less expensive to make modifications to a design early on in the process, before significant investment in item writing and trialing has been made. The ability to simulate a test at the design phase can be used to understand the constraints of the design at an early stage and make changes in a low-cost, low-risk way. In this post we'll show how the [`mstR` R package](https://cran.r-project.org/web/packages/mstR/) can be used to run simulations for a MST design. First though we'll cover the data sources that we'll be using.
 
 ## Data Sources and Management
 

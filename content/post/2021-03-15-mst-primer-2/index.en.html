@@ -5,10 +5,10 @@ date: '2021-03-15'
 slug: mst-primer-2
 categories: R
 tags:
-- irt
-- rasch
-- mst
-- mstR
+  - irt
+  - rasch
+  - mst
+  - mstR
 subtitle: A practical guide to developing a computerised multistage test (MST)
 description: "Explains how to use simulation to improve the design of a computerised multistage test (MST)."
 lastmod: '2021-03-15T08:14:25Z'
@@ -47,7 +47,7 @@ bibliography: references.bib
 <p>In this post we’ll describe the steps required for the development of a computerised multistage test (MST). In particular we’ll look at initial validation of a test design. The <a href="/2021/03/08/mst-primer-1/">previous post</a> considered some of the design considerations you need to think about when developing a new <strong>multistage test</strong> (MST). This post shows some examples of how to perform this validation using R.</p>
 <div id="simulation" class="section level2">
 <h2>Simulation</h2>
-<p>In the pre-trial stage, it is useful to run simulations to help us answer the questions posed in the previous part of this article. The results of these simulations will help inform final decisions about the test design. It’s always less expensive to make modifications to a design early on in the process, before significant investment in item writing and trialling has been made. The ability to simulate a test at the design phase can be used to understand the constraints of the design at an early stage and make changes in a low-cost, low-risk way. In this post we’ll show how the <a href="https://cran.r-project.org/web/packages/mstR/"><code>mstR</code> R package</a> can be used to run simulations for a MST design. First though we’ll cover the data sources that we’ll be using.</p>
+<p>In the pre-trial stage, it is useful to run simulations to help us answer the questions posed in the previous part of this article. The results of these simulations will help inform final decisions about the test design. It’s always less expensive to make modifications to a design early on in the process, before significant investment in item writing and trialing has been made. The ability to simulate a test at the design phase can be used to understand the constraints of the design at an early stage and make changes in a low-cost, low-risk way. In this post we’ll show how the <a href="https://cran.r-project.org/web/packages/mstR/"><code>mstR</code> R package</a> can be used to run simulations for a MST design. First though we’ll cover the data sources that we’ll be using.</p>
 </div>
 <div id="data-sources-and-management" class="section level2">
 <h2>Data Sources and Management</h2>

@@ -1,6 +1,6 @@
 ---
-title: Validation of Multistage Tests (MSTs)
-author: James Page
+title: "Validation of Multistage Tests (MSTs)"
+author: "James Page"
 date: '2021-03-22'
 slug: mst-primer-3
 categories:
@@ -53,10 +53,10 @@ bibliography: references.bib
 </ul>
 </div>
 
-<p>After making final decisions about test design, test development can start in earnest. In this post we describe what needs to be done before a MST can be finalized.</p>
+<p>In the <a href="/2021/03/15/mst-primer-2/">previous post</a> in this series we showed how simluated tests can be used to help decide on the optimal test design. Once final decisions about test design have been made, test development can start in earnest. In this post we describe what needs to be done before a MST can be finalized. The example we’re using in this series is that of an English language proficiency test where the candidates are to be rated according to the well-known <a href="https://www.coe.int/lang-cefr/">Common European Framework of Reference for Languages</a>, or CEFR.</p>
 <div id="test-construction" class="section level2">
 <h2>Test Construction</h2>
-<p>Once the parameters of the test design are well established, the test designers should have a good idea of the number of modules, items and relative difficulties required. Where possible the simplest design is preferred. In our case for the sake of simplicity we’ll go with design 1:</p>
+<p>Once the parameters of the test design are well established, the test designers should have a good idea of the number of modules, items and relative difficulties required. Where possible the simplest design is preferred. In our case for the sake of simplicity we’ll go with <em>design 1</em> from the six candidates we considered in the <a href="/2021/03/15/mst-primer-2/">Development of Multistage Tests</a> post:</p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 <span id="tab:mst-design-1">Table 1: </span>MST Design 1
@@ -150,10 +150,11 @@ G
 </tr>
 </tbody>
 </table>
+<p>Here the <strong>Stage</strong> columns show the number of items in each stage and the <strong>Module</strong> columns show the mean difficulty for each module.</p>
 <div id="item-writing" class="section level3">
 <h3>Item Writing</h3>
 <p>A process of item writing will then be undertaken. Subject matter experts (SMEs) will be brought in to help define the instructions for test writers. A set of items will then be created by the team of item writers. To take our test design example, we’ll establish the number of items for each module that will be required at each CEFR level.</p>
-<p>In general, the test designers will want to ensure that each module contains a balance of items of varying difficulty within the target ability range for each module. The Common European Frame of Reference (CEFR) is used to assign items into different ability levels (A1-C2). In our example, the 12 items in Module A cover all levels of the CEFR, as in Figure <a href="#fig:Module-A-Items">1</a>.</p>
+<p>In general, the test designers will want to ensure that each module contains a balance of items of varying difficulty within the target ability range for each module. The Common European Framework of Reference (CEFR) is used to assign items into different ability levels (A1-C2). In our example, the 12 items in Module A cover all levels of the CEFR, as in Figure <a href="#fig:Module-A-Items">1</a>.</p>
 <div class="figure"><span id="fig:Module-A-Items"></span>
 <img src="images/moduleA-items.png" alt="Module A Items" width="200%" height="200%" />
 <p class="caption">
@@ -163,7 +164,7 @@ Figure 1: Module A Items
 </div>
 <div id="initial-validation-of-item-quality" class="section level3">
 <h3>Initial Validation of Item Quality</h3>
-<p>A group of raters (confusingly also called a panel of experts) will then be used to validate items in a level panel exercise, and ensure that they are set at the correct target CEFR level. Rating sheets are then collated and a decision then made on the CEFR rating for each item in the item bank. Various methods can be used to converge on an agreed CEFR level for each item; the simplest is to find the modal (ie. the most frequently occurring value) from all your raters. Where there is no single mode, or there are wide disagreements between raters, a manual adjustment to a commonly agreed CEFR level that is close to the average may be required. Ideally at least 5 raters would be used for each item to avoid this as far as possible.</p>
+<p>A group of raters (confusingly also called a <em>panel of experts</em>) will then be used to validate items in a level panel exercise, and ensure that they are set at the correct target CEFR level. Rating sheets are then collated and a decision then made on the CEFR rating for each item in the item bank. Various methods can be used to converge on an agreed CEFR level for each item; the simplest is to find the mode (the most frequently occurring rating) from all the raters. Where there is no single mode, or there are wide disagreements between raters, a manual adjustment to a commonly agreed CEFR level that is close to the average may be required. Ideally at least 5 raters would be used for each item.</p>
 <p>Once CEFR levels are confirmed for each item, they can be used to update the item bank. Then it is a matter of assigning items to each module according to the test design.</p>
 </div>
 <div id="initial-trialling" class="section level3">
@@ -171,19 +172,20 @@ Figure 1: Module A Items
 <p>The purpose of the initial trial is to administer a test (a prototype panel) to a sample cohort of test takers Care should be taken to ensure that this cohort is representative of the target candidature. Principles of sampling and research design will need to be carefully thought out. The actual test responses can then be used to calibrate item difficulties using the selected IRT model. We’ll use the 1PL (Rasch) model in the examples that follow.</p>
 <div id="import-and-validation-of-trial-data" class="section level4">
 <h4>Import and validation of trial data</h4>
-<p>The trial data is usually received as CSV or Excel files that comprise a candidate ID and then a set of responses (0 or 1) for each item. Not all items will have been taken by each candidate so there will be many NA values occurring. Data validation and cleaning to make sure the data from the field is correct and in the right format for processing are a key part of preparing the data from the trial so that it can be used in a Rasch analysis.</p>
+<p>The trial data is typically received from the field as CSV or Excel files containing a rows of candidate IDs and their corresponding set of responses (0 or 1) for each item. Not all items will have been taken by each candidate so there will likely be many NA values occurring. Data validation and cleaning to make sure the data from the field is correct and in the right format for processing are a key part of preparing the data from the trial so that it can be used in a Rasch analysis.</p>
 <pre class="r"><code>dfTestResponses &lt;- read_csv(&#39;trial-data.csv&#39;)</code></pre>
-<pre><code>Parsed with column specification:
+<pre><code>
+── Column specification ────────────────────────────────────────────────────────
 cols(
   .default = col_double(),
   Candidate = col_character()
-)</code></pre>
-<pre><code>See spec(...) for full column specifications.</code></pre>
+)
+ℹ Use `spec()` for the full column specifications.</code></pre>
 <pre class="r"><code>kbl(head(dfTestResponses[1:8]), caption = &#39;Example Test Reponses&#39;) %&gt;%
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-(#tab:Trial Data)Example Test Reponses
+<span id="tab:Trial-Data">Table 2: </span>Example Test Reponses
 </caption>
 <thead>
 <tr>
@@ -372,11 +374,11 @@ Cand00091
 </tr>
 </tbody>
 </table>
-<p>The <code>ltm</code> library can be used to fit a number of dichotomous and polytomous IRT models. It’s the fastest R library that we’ve used for fitting a Rasch model. Before doing that we get some summary statistics from the data, including the <em>Cronbach’s alpha</em> measure of covariance.</p>
+<p>The <a href="https://cran.r-project.org/web/packages/ltm/"><code>ltm</code></a> library can be used to fit a number of dichotomous and polytomous IRT models. It’s the fastest R library that we’ve used for fitting a Rasch model. Before doing that we get some summary statistics from the data, including the <em>Cronbach’s alpha</em> measure of covariance.</p>
 </div>
 <div id="consistency-and-reliability" class="section level4">
 <h4>Consistency and reliability</h4>
-<p>We want to make sure that our modules are internally consistent and reliable as tests of a given latent trait. In our test we’ve grouped various skills or abilities into the different stages. So, in our example, stage 1 (ie. Module A) is designed as a test of language use, stage 2 (Modules B and C) is designed to measure reading skills, and stage 3 is designed to measure listening skills. The overall test is designed to measure English language ability in non-native learners of English (regardless of age, which is a consideration that we are not covering here).</p>
+<p>We want to make sure that our modules are internally consistent and reliable as tests of a given latent trait. In our test we’ve grouped various skills or abilities into the different stages. So, in our example, stage 1 (that is, Module A) is designed as a test of language use, stage 2 (containing Modules B and C) is designed to measure reading skills, and stage 3 is designed to measure listening skills. The overall test is designed to measure English language ability in non-native learners of English (regardless of age, which is a consideration that we are not covering here).</p>
 <p>Cronbach’s alpha is a function of the number of items in a test, the average covariance between pairs of items, and the variance of the total score. It is defined as:</p>
 <p><span class="math display">\[
 \alpha = \frac{p \times \bar{r}}{1 + (p – 1)\bar{r}}
@@ -385,7 +387,7 @@ Cand00091
 <p>Since in our test we’ve split our items into different modules according to the skill that is being measured, so it makes sense to calculate alphas for each module, although we could also do so by stage if we wanted. We need to make sure that we remove any rows containing NA values before calculating Cronbach’s alpha.</p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-(#tab:Cronbachs alpha)Cronbach’s Alpha
+<span id="tab:Cronbachs-alpha">Table 3: </span>Cronbach’s Alpha
 </caption>
 <thead>
 <tr>
@@ -528,8 +530,20 @@ G
 </tr>
 </tbody>
 </table>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/Cronbachs%20alpha-1.png" width="576" /></p>
-<p>Ideally, we’re looking for alphas of 0.7 and above; less than this indicates that there is weak covariance between the items in the module, which means they may not be testing the same trait. This measure is really only useful as a guide for further investigations; the ultimate decision on whether to modify the items in each module should be taken in collaboration with the subject matter experts. We can see that several of these values are really quite low; it should be borne in mind however that this is a simulated dataset that was generated for the purposes of testing the data pipeline.</p>
+<pre class="r"><code>ggplot(dfCronbachsAlpha, 
+       aes(x=alpha, y=num_responses, size = num_items, color = moduleNames)) +
+    geom_point() +
+    scale_x_continuous(limits = c(0, 1)) +
+    theme(legend.position = &quot;right&quot;) +
+    labs(x = &quot;alpha&quot;, y = &quot;# responses&quot;) +
+    geom_vline(xintercept = 0.7, linetype=&quot;dotted&quot;)</code></pre>
+<div class="figure"><span id="fig:cronbach-plot"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/cronbach-plot-1.png" alt="Cronbach's Alpha for Panel 1" width="576" />
+<p class="caption">
+Figure 2: Cronbach’s Alpha for Panel 1
+</p>
+</div>
+<p>Ideally, we’re looking for alphas of 0.7 and above, the dashed vertical line in Figure <a href="#fig:cronbach-plot">2</a> indicates this threshold; much less than this indicates that there is weak covariance between the items in the module, which means they may not be testing the same trait. This measure is really only useful as a guide for further investigations; the ultimate decision on whether to modify the items in each module should be taken in collaboration with the subject matter experts. We can see that several of these values are really quite low; it should be borne in mind however that this is a simulated data set that was generated for the purposes of testing the data pipeline.</p>
 </div>
 </div>
 <div id="rasch-model" class="section level3">
@@ -550,20 +564,22 @@ df_displayDifficulties &lt;- data.frame(
   b = as.vector(df_difficulties[,1])
 )
 df_displayDifficulties &lt;- df_displayDifficulties %&gt;%
-  filter(str_detect(item_id, &quot;(Item[0-9]+)&quot;))
-
-ggplot(data = na.omit(df_displayDifficulties)) +
+  filter(str_detect(item_id, &quot;(Item[0-9]+)&quot;))</code></pre>
+<pre class="r"><code>ggplot(data = na.omit(df_displayDifficulties)) +
   geom_bar(mapping = aes(x = reorder(item_id, -b), y = b), stat = &quot;identity&quot;, fill = &quot;cornflowerblue&quot;) +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
   labs(x = &quot;items&quot;, y = &quot;Difficulty (b)&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/Item%20difficulties-1.png" width="576" /></p>
-<p>This chart makes it easy to spot any outlier items that have a very large divergence from the mean; it is best to remove these items from the item bank as they have too large an error (or rather too little information) to be used in a live test. Usually this is the result of them having all 1’s or 0’s (in other words they are too easy or too difficult for all candidates who took them).</p>
+<div class="figure"><span id="fig:item-difficulty-rank"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/item-difficulty-rank-1.png" alt="Item Difficulty Ranking" width="576" />
+<p class="caption">
+Figure 3: Item Difficulty Ranking
+</p>
+</div>
+<p>The Figure <a href="#fig:item-difficulty-rank">3</a> chart makes it easy to spot any outlier items that have a very large divergence from the mean; it is best to remove these items from the item bank as they have too large an error (or rather too little information) to be used in a live test. Usually this is the result of them having all 1’s or 0’s (in other words they are too easy or too difficult for all candidates who took them).</p>
 </div>
 <div id="banking-the-updated-difficulty-parameters" class="section level3">
 <h3>Banking the Updated Difficulty Parameters</h3>
-<p>Once difficulty values have been calculated by fitting the Rasch model, the item bank should be updated to reflect this. The item difficulty (<span class="math inline">\(b\)</span> parameter) is a key component of the item, and should be stored along with the other information about the item (including its rated CEFR level by the subject expert panellists). If a 2PL model is being used, then the discrimination (<span class="math inline">\(a\)</span> parameter) would also be stored.</p>
-<pre class="r"><code># output a CSV file with the item difficulties
-write_csv(df_displayDifficulties, &quot;item-difficulties.csv&quot;)</code></pre>
+<p>Once difficulty values have been calculated by fitting the Rasch model, the item bank should be updated to reflect this. The item difficulty (<span class="math inline">\(b\)</span> parameter) is a key component of the item, and should be stored along with the other information about the item (including its rated CEFR level by the subject expert panelists). If a 2PL model is being used, then the discrimination (<span class="math inline">\(a\)</span> parameter) would also be stored.</p>
 </div>
 <div id="item-characteristic-curves-iccs" class="section level3">
 <h3>Item Characteristic Curves (ICCs)</h3>
@@ -572,16 +588,21 @@ write_csv(df_displayDifficulties, &quot;item-difficulties.csv&quot;)</code></pre
 itemID &lt;- str_extract(rownames(df_difficulties)[itemNo], &quot;Item\\d+&quot;)
 itemDifficulty &lt;- df_difficulties[itemNo]
 itemPlot &lt;- data.frame(plot(raschmodel, type = &quot;ICC&quot;, items = itemNo, plot = FALSE))
-colnames(itemPlot) &lt;- c(&#39;theta&#39;, &#39;probability&#39;)
-ggplot(itemPlot, aes(x=theta, y=probability)) + 
+colnames(itemPlot) &lt;- c(&#39;theta&#39;, &#39;probability&#39;)</code></pre>
+<pre class="r"><code>ggplot(itemPlot, aes(x=theta, y=probability)) + 
   geom_line() +
-  labs(title=&quot;Item Characteristic Curve&quot;, x=&quot;theta&quot;, y=&quot;P(X=1)&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
-<p>In this example Figure 12 we see the item characteristic curve (ICC) for Item106 with difficulty <span class="math inline">\(b\)</span> = 2.1169248.</p>
+  labs(title=paste(&quot;Item Characteristic Curve:&quot;, itemID), x=&quot;theta&quot;, y=&quot;P(X=1)&quot;)</code></pre>
+<div class="figure"><span id="fig:icc-plot"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/icc-plot-1.png" alt="Item Characteristic Curve" width="576" />
+<p class="caption">
+Figure 4: Item Characteristic Curve
+</p>
+</div>
+<p>In Figure <a href="#fig:icc-plot">4</a> we see the item characteristic curve (ICC) for Item106 with difficulty <span class="math inline">\(b\)</span> = 2.1166565. Note that for consistency with other figures in this post I’m using <code>ggplot</code> to visualise the ICC; by passing the <code>plot = FALSE</code> parameter to the <code>ltm::plot()</code> function we can return a data frame that can then be used by <code>ggplot</code>.</p>
 </div>
 <div id="module-characteristic-curves-mccs" class="section level3">
 <h3>Module Characteristic Curves (MCCs)</h3>
-<p>You can sum the ICCs for all items in a module to get a Module Characteristic Curve (MCC) that expresses the difficulty for that module. These graphs show the relative difficulty of each module. They can be used to calibrate the modules so they are in line with the assumptions about module difficulty. The range of the difficulty of items as well as the mean module difficulty should also be checked and, if necessary, adjusted.</p>
+<p>You can sum the ICCs for all items in a module to get a Module Characteristic Curve (MCC) that expresses the relative difficulty for that module. The MCCs can be used to calibrate the modules so they are in line with the assumptions about module difficulty. The range of the difficulty of items as well as the mean module difficulty should also be checked and, if necessary, adjusted.</p>
 <p>First we’ll create a helper function called <code>trueScoreSummary</code> to convert the plot data we get from the <code>ltm</code> package into a format we can use for visualisations with <code>ggplot</code>.</p>
 <pre class="r"><code># return a data frame with true score summaries
 # that can then be plotted
@@ -598,29 +619,38 @@ informationCoefficients &lt;- function(plotData, module=NA) {
              theta = as.vector(plotData[,1]), 
              information = as.vector(rowSums(plotData[,-1])))
 }</code></pre>
-<p>We get the indices of the module A items and then create the plotting data before graphing it.</p>
+<p>We get the indices of the module A items and then create the plotting data before graphing it (in Figure <a href="#fig:MCC-stage1-graph">5</a>).</p>
 <pre class="r"><code>moduleA1_items &lt;- which(colnames(dfTrial) %in% colnames(dfModuleAItems))
 plotData &lt;- trueScoreSummary(plot(raschmodel, 
                                   type = &quot;ICC&quot;, 
                                   items = moduleA1_items, plot = FALSE), 
-                             &quot;A&quot;)
-ggplot(plotData, aes(x=theta, y=trueScore)) + 
+                             &quot;A&quot;)</code></pre>
+<pre class="r"><code>ggplot(plotData, aes(x=theta, y=trueScore)) + 
   geom_line() +
   labs(title=&quot;Module Characteristic Curve (Stage 1)&quot;, x=&quot;theta&quot;, y=&quot;True Score&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/Stage%201%20MCC-1.png" width="576" /></p>
+<div class="figure"><span id="fig:MCC-stage1-graph"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/MCC-stage1-graph-1.png" alt="Module Characteristic Curve for Stage 1" width="576" />
+<p class="caption">
+Figure 5: Module Characteristic Curve for Stage 1
+</p>
+</div>
 <p>We can go on to compare the MCCs for the stage 2 modules:</p>
 <pre class="r"><code>moduleB1_items &lt;- which(colnames(dfTrial) %in% colnames(dfModuleBItems))
 moduleC1_items &lt;- which(colnames(dfTrial) %in% colnames(dfModuleCItems))
 
 plotData &lt;- rbind(
   trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleB1_items, plot = FALSE), &quot;B&quot;),
-  trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleC1_items, plot = FALSE), &quot;C&quot;)) 
-
-ggplot(plotData, aes(x=theta, y=trueScore)) + 
+  trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleC1_items, plot = FALSE), &quot;C&quot;)) </code></pre>
+<pre class="r"><code>ggplot(plotData, aes(x=theta, y=trueScore)) + 
   geom_line(aes(colour=module)) +
   labs(title=&quot;Module Characteristic Curves (Stage 2)&quot;, x=&quot;theta&quot;, y=&quot;True Score&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/Stage%202%20MCCs-1.png" width="576" /></p>
-<p>Looking at Figure 14, a problem we can already see is that these curves look very straight - ideally there should be a nice sigmoid shape to them. These MCCs have a low information content - in other words they are not very discriminating. We may want to move some items between modules, or reject items that have poor discrimination, or even go back to the drawing board and add some more quality items.</p>
+<div class="figure"><span id="fig:MCC-stage2-graph"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/MCC-stage2-graph-1.png" alt="Module Characteristic Curves for Stage 2" width="576" />
+<p class="caption">
+Figure 6: Module Characteristic Curves for Stage 2
+</p>
+</div>
+<p>A problem we can already see in Figure <a href="#fig:MCC-stage2-graph">6</a> is that these curves don’t really look very much like curves at all! Ideally there should be a nice sigmoid shape to them. These MCCs have a low information content - in other words they are not very discriminating. We may want to move some items between modules, or reject items that have poor discrimination, or even go back to the drawing board and add some more quality items.</p>
 <p>And for the modules in stage 3:</p>
 <pre class="r"><code>moduleD1_items &lt;- which(colnames(dfTrial) %in% colnames(dfModuleDItems))
 moduleE1_items &lt;- which(colnames(dfTrial) %in% colnames(dfModuleEItems))
@@ -631,13 +661,17 @@ plotData &lt;- rbind(
   trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleD1_items, plot = FALSE), &quot;D&quot;),
   trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleE1_items, plot = FALSE), &quot;E&quot;),
   trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleF1_items, plot = FALSE), &quot;F&quot;),
-  trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleG1_items, plot = FALSE), &quot;G&quot;)) 
-
-ggplot(plotData, aes(x=theta, y=trueScore)) + 
+  trueScoreSummary(plot(raschmodel, type = &quot;ICC&quot;, items = moduleG1_items, plot = FALSE), &quot;G&quot;)) </code></pre>
+<pre class="r"><code>ggplot(plotData, aes(x=theta, y=trueScore)) + 
   geom_line(aes(colour=module)) +
   labs(title=&quot;Module Characteristic Curves (Stage 3)&quot;, x=&quot;theta&quot;, y=&quot;True Score&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/Stage%203%20MCCs-1.png" width="576" /></p>
-<p>All of the modules are quite similar in terms of difficulty (the MCCs are quite close to each other), and moreover the lines are quite flat - there is little discrimination between them. So we may want to look at moving some items between modules, or rejecting items with poor discrimination,</p>
+<div class="figure"><span id="fig:MCC-stage3-graph"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/MCC-stage3-graph-1.png" alt="Module Characteristic Curves for Stage 3" width="576" />
+<p class="caption">
+Figure 7: Module Characteristic Curves for Stage 3
+</p>
+</div>
+<p>In Figure <a href="#fig:MCC-stage3-graph">7</a>, all of the modules are quite similar in terms of difficulty (you can see that the MCCs are quite close to each other), and moreover the lines are still quite flat (although better than the stage 2 MCCs). We may want to look at moving some items between modules, or rejecting items with poor discrimination,</p>
 </div>
 </div>
 <div id="cut-scores-and-scale-scores" class="section level2">
@@ -646,12 +680,12 @@ ggplot(plotData, aes(x=theta, y=trueScore)) +
 <div id="scale-scores-for-test-reporting" class="section level3">
 <h3>Scale Scores for Test Reporting</h3>
 <p>It would be possible to provide candidates with their <span class="math inline">\(\hat{\theta}\)</span> at the end of the test. However most candidates and testing organisations do not like theta values; the concept of zero as the population mean, or negative ability values are difficult for many people to conceptualise. We decide therefore to convert the theta value into a scale score for reporting purposes. This usually involves fitting the theta to a range that is chosen by the testing body and acceptable for its stakeholders (for example a score in the range 20-80).</p>
-<p>Before we get to that point however we’ll cover the case where the test administration system is unable to calculate the theta estimate and we need to provide a true score to scale score mapping. We do this by first converting true score to theta estimate, and then mapping the theta estimate on to a scale score. True score is simply the number correct (NC) for a given module.</p>
+<p>Before we get to that point however we’ll cover the case where the test administration system is unable to calculate the theta estimate and we are required to provide a <em>true score to scale score</em> mapping. We do this by first converting true score to a theta estimate, and then mapping the theta estimate on to a scale score. True score is simply the number correct (NC) for a given module. This is possible due to the fact that the sum of the item probabilities for a module (for a given ability level) is equivalent to the expected (most likely) true score for that module for that ability.</p>
 <div id="converting-true-score-to-theta" class="section level4">
 <h4>Converting True Score to Theta</h4>
 <p>Recall that the MCCs provide a mapping from the number of correct scores for each module to an ability estimate: <span class="math inline">\(\hat{\theta}\)</span>. A quintic polynomial can be used to fit the MCC, and the resulting coefficients of this polynomial function can then used by the test administration system to provide an ability estimate at the end of each module. The scale scores can then be used to provide an aggregated test score once the final stage of the MST has completed.</p>
-<p>Effectively we use a polynomial regression to map the non-linear relationship between the number correct that a candidate scores and the ability estimate based on the items in that module. This is possible because of the direct summative relationship between ICCs and MCCs to derive ability estimates. You may ask why do we need to go to the trouble of fitting a seperate regression to what is a effectively a sum of logistic regressions? The difficulty here arises for test administration systems where the item difficulties are unknown (because access to these values from the item bank is unavailable), or the system is not capable of using the IRT functions to compute the ICCs and MCCs from the item parameters. The number of possible values is limited anyway (the number correct value for a module will be <span class="math inline">\(n + 1\)</span>, where <span class="math inline">\(n\)</span> is the number of items in the module), so another approach is to simply store the NC to ability estimate equivalences in a table for lookup during test administration.</p>
-<p>A different approach that is worth considering is the use of the D-Scores (see <span class="citation">Han, Dimitrov, and Al-Mashary (<a href="#ref-han2019developing" role="doc-biblioref">2019</a>)</span>). We have not had time to undertake a full investigation of the D-Scoring method, but it is certainly something we intend to look at in a future article.</p>
+<p>Effectively we use a polynomial regression to map the non-linear relationship between the number correct that a candidate scores and the ability estimate based on the items in that module (based on the summative relationship between ICCs and MCCs for deriving ability estimates). You may ask why do we need to go to the trouble of fitting a separate regression to what is a effectively a sum of logistic regressions? The difficulty here arises for test administration systems where the item difficulties are unknown (because access to these values from the item bank is unavailable), or the system is not capable of using the IRT functions to compute the ICCs and MCCs from the item parameters. The number of possible values is limited anyway (the number correct value for a module will be <span class="math inline">\(n + 1\)</span>, where <span class="math inline">\(n\)</span> is the number of items in the module), so another approach is to simply store the NC to ability estimate equivalences in a table for look up during test administration.</p>
+<p>A different approach that is worth considering is the use of D-Scores (see <span class="citation">Han, Dimitrov, and Al-Mashary (<a href="#ref-han2019developing" role="doc-biblioref">2019</a>)</span>). We have not had time to undertake a full investigation of the D-Scoring method, but it is certainly something we intend to look at in a future article.</p>
 </div>
 <div id="module-a-mapping-function" class="section level4">
 <h4>Module A Mapping Function</h4>
@@ -663,16 +697,16 @@ lm(formula = theta ~ poly(trueScore, degree = 5, raw = TRUE),
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--0.062017 -0.011524  0.000278  0.011338  0.029829 
+-0.062026 -0.011527  0.000278  0.011341  0.029833 
 
 Coefficients:
                                            Estimate Std. Error t value Pr(&gt;|t|)
 (Intercept)                              -4.671e+00  1.586e-02 -294.51   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)1  2.027e+00  2.542e-02   79.75   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)2 -5.398e-01  1.268e-02  -42.57   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)3  9.321e-02  2.661e-03   35.02   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)1  2.028e+00  2.542e-02   79.75   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)2 -5.398e-01  1.268e-02  -42.56   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)3  9.322e-02  2.662e-03   35.02   &lt;2e-16
 poly(trueScore, degree = 5, raw = TRUE)4 -7.812e-03  2.467e-04  -31.66   &lt;2e-16
-poly(trueScore, degree = 5, raw = TRUE)5  2.570e-04  8.335e-06   30.84   &lt;2e-16
+poly(trueScore, degree = 5, raw = TRUE)5  2.571e-04  8.336e-06   30.84   &lt;2e-16
                                             
 (Intercept)                              ***
 poly(trueScore, degree = 5, raw = TRUE)1 ***
@@ -685,19 +719,19 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 
 Residual standard error: 0.01587 on 94 degrees of freedom
 Multiple R-squared:      1, Adjusted R-squared:  0.9999 
-F-statistic: 3.899e+05 on 5 and 94 DF,  p-value: &lt; 2.2e-16</code></pre>
+F-statistic: 3.898e+05 on 5 and 94 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The low p-values indicate that this is a useful model for our purpose. From here we pull out the coefficients (terms) that will be used for the polynomial function.</p>
 <pre class="r"><code>gA_coeffs &lt;- unname(coef(lm_moduleA_scores_poly))
 
 (gA_coeffs)</code></pre>
-<pre><code>[1] -4.6706392692  2.0274974271 -0.5397948845  0.0932110928 -0.0078116250
-[6]  0.0002570406</code></pre>
+<pre><code>[1] -4.6705869486  2.0275443918 -0.5398153370  0.0932155072 -0.0078120430
+[6]  0.0002570543</code></pre>
 <p>In order to calculate the ability for a candidate, such a function can be used to map from the number correct (NC) score to an estimated theta for candidate <span class="math inline">\(i\)</span>: <span class="math inline">\(\hat\theta_i\)</span>. The <span class="math inline">\(g_A()\)</span> function that will be used for module A could be written as an R function like this:</p>
 <pre class="r"><code>gA &lt;- function(x) {
   return(gA_coeffs[6]*x^5 + gA_coeffs[5]*x^4 + gA_coeffs[4]*x^3 + 
            gA_coeffs[3]*x^2 + gA_coeffs[2]*x + gA_coeffs[1])
 }</code></pre>
-<p>The parameter <code>x</code> is the NC score. So, a candidate who scores 9 out of 12 on module A would have a <span class="math inline">\(\hat\theta\)</span> = 1.7302586.</p>
+<p>The parameter <code>x</code> is the NC score. So, a candidate who scores 9 out of 12 on module A would have a <span class="math inline">\(\hat\theta\)</span> = 1.7303618.</p>
 </div>
 <div id="validating-the-mapping-function" class="section level4">
 <h4>Validating the Mapping Function</h4>
@@ -706,19 +740,22 @@ F-statistic: 3.899e+05 on 5 and 94 DF,  p-value: &lt; 2.2e-16</code></pre>
   trueScore = c(seq(0,12)),
   theta = c(rep(0, 13))
 )
-df_gA$theta &lt;- gA(df_gA$trueScore)
-
-# plot the theta/true score curve
-ggplot(df_moduleA_TS, aes(x = theta, y = trueScore)) +
+df_gA$theta &lt;- gA(df_gA$trueScore)</code></pre>
+<pre class="r"><code>ggplot(df_moduleA_TS, aes(x = theta, y = trueScore)) +
   geom_line(color = &quot;red&quot;, linetype=&quot;dashed&quot;) +
   geom_point(data = df_gA, aes(x = theta, y = trueScore)) +
   scale_x_continuous(name=&quot;theta&quot;, limits=c(-4, 4)) +
   scale_y_continuous(name=&quot;True Score&quot;, limits=c(0, 12), 
                      minor_breaks = NULL, n.breaks = 12)</code></pre>
 <pre><code>Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="576" /></p>
-<p>We can see that it is a good fit - the black dots that are dervied from applying <span class="math inline">\(g_A()\)</span> to each possible true score show very little error from the original MCC (red dotted line). This is true both in the middle of the range, and importantly at the upper and lower bounds.</p>
-<p>We then need to go through each module in every panel and create a true score mapping function for each. These functions, or the lookup-tables that they can be used to generate, will then need to be provided to the developers of the test delivery software so that they can be used to calculate theta estimates and scale scores for each module.</p>
+<div class="figure"><span id="fig:theta-true-score-fit"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/theta-true-score-fit-1.png" alt="Plotting the theta/true score curve" width="576" />
+<p class="caption">
+Figure 8: Plotting the theta/true score curve
+</p>
+</div>
+<p>We can see that in Figure <a href="#fig:theta-true-score-fit">8</a> there is a good fit - the black dots that are derived from applying <span class="math inline">\(g_A()\)</span> to each possible true score show very little error from the original MCC (red dotted line). This is true both in the middle of the range, and importantly at the upper and lower bounds.</p>
+<p>We then need to go through each module in every panel and create a true score mapping function for each. These functions, or the lookup tables that they can be used to generate, will then need to be provided to the developers of the test delivery software so that they can be used to calculate theta estimates and scale scores for each module.</p>
 </div>
 <div id="scale-scoring-function" class="section level4">
 <h4>Scale Scoring Function</h4>
@@ -743,7 +780,7 @@ scaleScore &lt;- s(thetaEstimate = 0.95, thetaRange = c(-4, 4))
 </div>
 <div id="cut-scores-for-routing" class="section level3">
 <h3>Cut scores for routing</h3>
-<p>We use the concept of the information function as a way of determining the best cut scores to use. Where a choice is needed to route onward to the next stage, we need to select a cut score to use. We could do this by simply selecting a mid-point in the true scale. For example, if the routing Module A has 12 items, then we might assume that if a candidate scores 0-5 they route to the easy module in the next stage (Module B), and if they score 6-12 they route to the harder module (Module C). Ideally though we’d like to base this on the results of the Rasch analysis. Using the Item Information Function (IIF) gives us a way of selecting a cut score based on IRT. First lets explain the Item Informtation Function.</p>
+<p>We use the concept of the information function as a way of determining the best cut scores to use. Where a choice is needed to route onward to the next stage, we need to select a cut score to use. We could do this by simply selecting a mid-point in the true scale. For example, if the routing Module A has 12 items, then we might assume that if a candidate scores 0-5 they route to the easy module in the next stage (Module B), and if they score 6-12 they route to the harder module (Module C). Ideally though we’d like to base this on the results of the Rasch analysis. Using the Item Information Function (IIF) gives us a way of selecting a cut score based on IRT. First lets explain the Item Information Function.</p>
 <div id="item-information-functions-iifs" class="section level4">
 <h4>Item Information Functions (IIFs)</h4>
 <p>We mentioned earlier that the IIF provides a way of showing at what ability level an item is most discriminating. The IIF can be represented visually like this, using the <code>plot</code> function from the <code>ltm</code> package:</p>
@@ -751,11 +788,16 @@ scaleScore &lt;- s(thetaEstimate = 0.95, thetaRange = c(-4, 4))
 itemID &lt;- str_extract(rownames(df_difficulties)[itemNo], &quot;Item\\d+&quot;)
 itemDifficulty &lt;- df_difficulties[itemNo]
 itemPlot &lt;- data.frame(plot(raschmodel, type = &quot;IIC&quot;, items = itemNo, plot = FALSE))
-colnames(itemPlot) &lt;- c(&#39;theta&#39;, &#39;information&#39;)
-ggplot(itemPlot, aes(x=theta, y=information)) + 
+colnames(itemPlot) &lt;- c(&#39;theta&#39;, &#39;information&#39;)</code></pre>
+<pre class="r"><code>ggplot(itemPlot, aes(x=theta, y=information)) + 
   geom_line() +
-  labs(title=&quot;Item Information Function&quot;, x=&quot;theta&quot;, y=&quot;I(theta)&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/Item%20Information%20Function-1.png" width="576" /></p>
+  labs(title=paste(&quot;Item Information Function:&quot;, itemID), x=&quot;theta&quot;, y=&quot;I(theta)&quot;)</code></pre>
+<div class="figure"><span id="fig:iif"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/iif-1.png" alt="Item Information Function" width="576" />
+<p class="caption">
+Figure 9: Item Information Function
+</p>
+</div>
 <p>For example this item shows a peak information for <span class="math inline">\(\hat{\theta} =\)</span> 2.1111111.</p>
 </div>
 <div id="module-information-functions-mifs" class="section level4">
@@ -778,14 +820,18 @@ stage2IIFs &lt;- inner_join(iifB, iifC, by = &quot;theta&quot;) %&gt;%
   arrange((abs(moduleB - moduleC))) %&gt;%
   head(n = 1)
 cutTheta &lt;- stage2IIFs$theta
-
-ggplot(plotData, aes(x=theta, y=information)) + 
+cutScore &lt;- round(df_moduleA_TS$trueScore[which.min(abs(df_moduleA_TS$theta - cutTheta))])</code></pre>
+<pre class="r"><code>ggplot(plotData, aes(x=theta, y=information)) + 
   geom_line(aes(colour=module)) +
   labs(title=&quot;Module Information Function&quot;, x=&quot;theta&quot;, y=&quot;I(theta)&quot;) +
   geom_vline(xintercept = cutTheta, linetype=&quot;dotted&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/Stage%202%20MIFs-1.png" width="576" /></p>
-<pre class="r"><code>cutScore &lt;- round(df_moduleA_TS$trueScore[which.min(abs(df_moduleA_TS$theta - cutTheta))])</code></pre>
-<p>Here in Figure 18 we can see that there is a point of intersection between Modules B and C where the ability estimate is -0.959596. If we read off the true score value that is equivalent for this theta estimate in Module A, then we can use this as the cut score; in this case the (rounded) true score is 4.</p>
+<div class="figure"><span id="fig:MIF-stage2-graph"></span>
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/MIF-stage2-graph-1.png" alt="Calculating cut scores for routing to Stage 2" width="576" />
+<p class="caption">
+Figure 10: Calculating cut scores for routing to Stage 2
+</p>
+</div>
+<p>Here we can see that there is a point of intersection between Modules B and C where the ability estimate is -0.959596. If we read off the true score value that is equivalent for this theta estimate in Module A, then we can use this as the cut score; in this case the (rounded) true score is 4.</p>
 </div>
 </div>
 </div>

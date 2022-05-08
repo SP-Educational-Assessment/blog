@@ -1,0 +1,131 @@
+---
+title: Using HMAC tokens to provide public URLs for your content
+author: James Page
+date: '2022-05-05'
+slug: using-hmac-tokens-to-provide-public-urls-for-your-content
+lastmod: '2022-05-05T22:04:56+01:00'
+featured: yes
+authors: [ 'james-page' ]
+series: [ 'Cloud Object Storage' ]
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+---
+
+In a [previous post](/2021/07/12/getting-started-with-ibm-cloud-object-storage/) I explained how to access content stored on 
+[IBM Cloud Storage (COS)](https://www.ibm.com/cloud/object-storage) programmatically by using the `boto` Python library. IAM API Keys were used for authentication.
+
+In this post I'll show how you can use HMAC tokens for authentication, and append these to a presigned URL to allow people to access your content simply by clicking on a link. These tokens are time limited, so this offers a relatively secure way of ensuring that only the people you want to can access your content.
+
+If you followed the previous post you'll have understood how to upload files to IBM Cloud Storage and then how to access them with a token using `curl` and from a Python script.
+
+IBM Cloud Storage allows you to provide public URLs for content by granting public access to a bucket. This means that anyone can access all the objects in the bucket. For many applications, this is too liberal. An answer is to use HMAC tokens. The idea is that we generate a special type of token (called an HMAC token), and then append this to the download URL. Only people who have been provided with the token can download the content.
+
+For the purposes of explanation, we'll continue to use the **TestData** storage service and the `studentdata` bucket that was created in the [previous post](/2021/07/12/getting-started-with-ibm-cloud-object-storage/).
+
+### HMAC tokens
+
+In general IAM API Keys are the preferred method of authentication for IBM Cloud Object Storage. HMAC tokens are also supported primarily for compatibility with earlier versions, but they are slightly more complicated because all requests must have an `x-amz-date` header with the date in `%Y%m%dT%H%M%SZ` format. However there are cases when using an HMAC token is the best option. As mentioned in the previous post, the access tokens we've been working with here are time-limited to one hour. If you want to use something more permanent (for example to provide a download link to a colleague) you will need to use the HMAC method. Use of an HMAC token is also required if you are using some other libraries.
+
+### Create Service Credentials
+
+You need to create an HMAC key that can be used to generate an HMAC token (from the Cloud Object Storage | Service credentials part of the IBM console). HMAC credentials consist of an Access Key and Secret Key paired for use with S3-compatible tools and libraries that require authentication.
+
+The following IBM Cloud docs provide a detailed overview of this: <https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-presign-url>
+
+To create the HMAC keys you first need to create a new **service credential** and make sure that the **Include HMAC Credential** option is selected.
+
+![Creating a Service Credential](images/create-hmac-credentials.png)
+
+You can then copy the credentials to the clipboard and extract the following section:
+  
+```json
+"cos_hmac_keys": {
+ "access_key_id": "89c45a0932404203bb7a415767face30",
+ "secret_access_key": "6042c1045d91d0f43fa5de48d3f450ef940a15f9a3fdc520"
+}
+```
+
+You don't need any of the other credentials for what follows.
+
+Alternately, if you'd rather use the CLI rather then the web console then you'd use a command like this:
+
+```bash
+ibmcloud resource service-key-create secret-access Reader \
+  --parameters '{"HMAC":true}' --instance-name TestData \
+  --output json | jq .credentials.cos_hmac_keys
+```
+
+### Setting up AWS CLI
+
+You then need to setup your `aws` CLI credentials to use these HMAC details. You'll need to use the `aws` command line tool for this. You can follow this instrutions [here](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to do this.
+
+```bash
+aws configure
+```
+
+As you go through these options you provide the `access_key_id`, followed by the `secret_access_key`, followed by the region (for example `eu-gb`) and then the output format (I recommend you set it to `json`). This creates the following files in your $HOME directory:
+
+```bash
+.aws/credentials
+.aws/config
+```
+
+You can open these files in a text editor to make sure they contain the details you just configured.
+
+
+## Creating an HMAC Token
+
+We can now create an HMAC token and append it to a download URL, like this:
+
+```bash
+aws s3 presign s3://my-secret-bucket/summary.pdf
+```
+
+You'll then end up with something that looks like this:
+
+<https://my-secret-bucket.s3.eu-gb.amazonaws.com/summary.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=33a86e66a83546c6b28f2024d62a0aa6%2F20210423%2Feu-gb%2Fs3%2Faws4_request&X-Amz-Date=20210423T204410Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=18924babd1e3939b9de19523cb133af67dfdc1c0abb879150614a9366bd10586>
+
+Whoops - we've got an AWS URL here, and we want an IBM COS one. OK, let's re-run that command and use the `--endpoint-url` switch to make sure that we're in IBM Cloud world, rather than AWS:
+
+```bash
+aws --endpoint-url=https://s3.eu.cloud-object-storage.appdomain.cloud \
+s3 presign s3://my-secret-bucket/summary.pdf
+```
+
+Right, that looks better:
+
+<https://s3.eu.cloud-object-storage.appdomain.cloud/my-secret-bucket/summary.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=6ba5a7fd56cb4f1eaf4275f721325c4c%2F20220508%2Feu-gb%2Fs3%2Faws4_request&X-Amz-Date=20220508T220917Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=f12a0f3f33394217c6e84106a2e6fe352e595d2be744e74264f6f99efd6f8046>
+
+Now we can test access to the object (either from a browser or using curl).
+
+Trying the same with just the bare URL (no token) should give a 403 Forbidden status:
+
+<https://s3.eu.cloud-object-storage.appdomain.cloud/my-secret-bucket/summary.pdf>
+
+Similarly if you use an invalid token, or attempt to download the file after the expiry.
+
+## Extending the Expiry Period
+
+Note that the default expiry period is 3600 seconds (one hour). You can extend this period; for example, we'll set it to 5 days (5 *24* 3600) like this:
+
+```bash
+aws --endpoint-url=https://s3.eu.cloud-object-storage.appdomain.cloud \
+s3 presign s3://my-secret-bucket/summary.pdf --expires-in 432000
+```
+
+If it's just IBM Cloud and the same endpoint you're using you can make life easier for yourself by setting up an alias in your .bash_profile (or .zshrc if you use ZSH):
+
+```bash
+alias aws="aws --endpoint-url=https://s3.eu.cloud-object-storage.appdomain.cloud"
+```
+
+The aws CLI allows you to list buckets and objects in buckets; for instance:
+
+```bash
+aws s3 ls s3://my-secret-bucket
+```
+
+See the Amazon documentation on using [S3 with the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-s3.html) for more details.
+
