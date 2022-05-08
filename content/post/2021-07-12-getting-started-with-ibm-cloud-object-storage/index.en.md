@@ -8,7 +8,7 @@ tags:
   - s3
   - python
 lastmod: '2021-07-12T22:32:49+01:00'
-featured: yes
+featured: no
 authors: [ 'james-page' ]
 series: [ 'Cloud Object Storage' ]
 image:
